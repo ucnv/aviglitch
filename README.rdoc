@@ -1,6 +1,33 @@
-= aviglitch
+= AviGlitch
 
-Description goes here.
+* http://github.com/ucnv/aviglitch/tree/master
+
+== Description:
+
+AviGlitch destroys your AVI files.
+
+I can't explain why they're going to destroy their own data.
+See wikipedia http://en.wikipedia.org/wiki/Compression_artifact
+
+== Synopsis:
+
+  require 'aviglitch'
+
+  avi = AviGlitch.new '/path/to/your.avi'
+  avi.glitch :keyframe do |data|
+    data.gsub(/\d/, '0')
+  end
+  avi.write '/path/to/broken.avi'
+
+This library also contains a command tool named +datamoshing+.
+It creates the keyframes removed video.
+
+  $ datamoshing /path/to/your.avi -o /path/to/broken.avi
+
+== Installation:
+
+  gem sources -a http://gems.github.com
+  sudo gem install ucnv-aviglitch
 
 == Copyright
 

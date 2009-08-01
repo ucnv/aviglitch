@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+# Generate datamoshing
+
+require 'rubygems'
+require 'aviglitch'
+
+if ARGV.size < 1 || ARGV.first == '--help'
+  puts <<-BANNER.gsub(/^\s+/, '')
+    Usage: #{File.basename $0} INPUT [OUTPUT]
+    Generate a datamoshing video from INPUT to OUTPUT (./out.avi by default).
+  BANNER
+  exit 0
+end
+
+input, output = ARGV
+
+a = AviGlitch.new input
+a.glitch_with_index :keyframe do |frame, i|
+  if i == 0  # keep the first frame
+    frame
+  else
+    "\000" * frame.size
+  end
+end
+a.write(output || 'out.avi')

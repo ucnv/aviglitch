@@ -5,11 +5,14 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "aviglitch"
-    gem.summary = %Q{TODO}
+    gem.summary = "A Ruby library to destroy your AVI files."
     gem.email = "ucnvvv@gmail.com"
     gem.homepage = "http://github.com/ucnv/aviglitch"
     gem.authors = ["ucnv"]
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    gem.files = %w(README.rdoc ChangeLog Rakefile VERSION) +
+      Dir.glob("{bin,spec,lib}/**/*") 
+
   end
 
 rescue LoadError
