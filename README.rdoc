@@ -1,0 +1,7 @@
+= aviglitch
+
+Description goes here.
+
+== Copyright
+
+Copyright (c) 2009 ucnv. See LICENSE for details.
