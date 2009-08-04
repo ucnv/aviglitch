@@ -62,7 +62,13 @@ class AviGlitch
   # Output the glitched file to +path+, and close the file.
   def write path
     FileUtils.cp @file.path, path
-    @file.close true
+    close
+  end
+
+  ##
+  # An explicit file close.
+  def close
+    @file.close!
   end
 
   ##
