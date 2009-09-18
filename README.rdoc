@@ -28,10 +28,10 @@ See followig urls for details;
   end
   avi.write('/path/to/broken.avi')
 
-This library also includes a command tool named +datamoshing+.
+This library also includes a command tool named +datamosh+.
 It creates the keyframes removed video.
 
-  $ datamoshing /path/to/your.avi /path/to/broken.avi
+  $ datamosh /path/to/your.avi /path/to/broken.avi
 
 == Installation
 
