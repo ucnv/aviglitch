@@ -13,7 +13,7 @@ class AviGlitch
     attr_reader :id, :flag
 
     ##
-    # Create new AviGlitch::Frame object.
+    # Create a new AviGlitch::Frame object.
     #
     # The arguments are:
     # [+data+] just data, without meta-data
@@ -42,7 +42,7 @@ class AviGlitch
     def is_deltaframe?
       is_videoframe? && @flag & AVIIF_KEYFRAME == 0
     end
-    
+
     ##
     # Alias for is_deltaframe?
     alias :is_pframe? :is_deltaframe?

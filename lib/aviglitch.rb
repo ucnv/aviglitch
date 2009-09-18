@@ -38,7 +38,7 @@ class AviGlitch
   attr_reader :file
 
   ##
-  # Create new instance of AviGlitch, open the file and 
+  # Create a new instance of AviGlitch, open the file and 
   # make it ready to manipulate.
   # It requires +path+ as String or Pathname.
   def initialize path

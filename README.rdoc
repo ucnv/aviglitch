@@ -2,33 +2,42 @@
 
 * http://github.com/ucnv/aviglitch/tree/master
 
-== Description:
+== Description
 
 AviGlitch destroys your AVI files.
 
 I can't explain why they're going to destroy their own data.
-See wikipedia http://en.wikipedia.org/wiki/Compression_artifact
 
-== Synopsis:
+See followig urls for details;
+* vimeo http://www.vimeo.com/groups/artifacts
+* wikipedia http://en.wikipedia.org/wiki/Compression_artifact
+
+== Features/Problems
+
+* Not supports AVI2 files right now.
+* Not supports files with interleave.
+* Parses only container level structure, not parses codecs.
+
+== Synopsis
 
   require 'aviglitch'
 
-  avi = AviGlitch.new '/path/to/your.avi'
-  avi.glitch :keyframe do |data|
+  avi = AviGlitch.new('/path/to/your.avi')
+  avi.glitch(:keyframe) do |data|
     data.gsub(/\d/, '0')
   end
-  avi.write '/path/to/broken.avi'
+  avi.write('/path/to/broken.avi')
 
-This library also contains a command tool named +datamoshing+.
+This library also includes a command tool named +datamoshing+.
 It creates the keyframes removed video.
 
   $ datamoshing /path/to/your.avi /path/to/broken.avi
 
-== Installation:
+== Installation
 
   gem sources -a http://gems.github.com
   sudo gem install ucnv-aviglitch
 
-== Copyright:
+== Copyright
 
 Copyright (c) 2009 ucnv. See LICENSE for details.
