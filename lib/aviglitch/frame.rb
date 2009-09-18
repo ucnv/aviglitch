@@ -1,6 +1,5 @@
 class AviGlitch
   
-  #
   # Frame is the struct of the frame data and meta-data.
   # You can access this class through AviGlitch::Frames.
   # To modify the binary data, operate the +data+ property.
@@ -35,10 +34,18 @@ class AviGlitch
     end
 
     ##
+    # Alias for is_keyframe?
+    alias :is_iframe? :is_keyframe?
+
+    ##
     # Returns if it is a video frame and also not a key frame.
     def is_deltaframe?
       is_videoframe? && @flag & AVIIF_KEYFRAME == 0
     end
+    
+    ##
+    # Alias for is_deltaframe?
+    alias :is_pframe? :is_deltaframe?
 
     ##
     # Returns if it is a video frame.

@@ -76,8 +76,8 @@ class AviGlitch
   # It is a convent method to iterate each frame.
   #
   # The argument +target+ takes symbols listed below:
-  # [<tt>:keyframe</tt>]   select video key frames (aka I-frame)
-  # [<tt>:deltaframe</tt>] select video delta frames (difference frames)
+  # [<tt>:keyframe</tt> or <tt>:iframe</tt>]   select video key frames (aka I-frame)
+  # [<tt>:deltaframe</tt> or <tt>:pframe</tt>] select video delta frames (difference frames)
   # [<tt>:videoframe</tt>] select both of keyframe and deltaframe
   # [<tt>:audioframe</tt>] select audio frames
   # [<tt>:all</tt>]        select all frames
