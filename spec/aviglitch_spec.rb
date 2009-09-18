@@ -9,7 +9,7 @@ describe AviGlitch do
   end
 
   after :each do
-    FileUtils.rm Dir.glob(OUTPUT_DIR + '*')
+    FileUtils.rm Dir.glob((OUTPUT_DIR + '*').to_s)
   end
 
   after :all do
