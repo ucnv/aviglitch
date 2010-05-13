@@ -8,7 +8,7 @@ AviGlitch destroys your AVI files.
 
 I can't explain why they're going to destroy their own data.
 
-See followig urls for details;
+See following urls for details;
 * vimeo http://www.vimeo.com/groups/artifacts
 * wikipedia http://en.wikipedia.org/wiki/Compression_artifact
 
@@ -28,16 +28,15 @@ See followig urls for details;
   end
   avi.write('/path/to/broken.avi')
 
-This library also includes a command tool named +datamosh+.
+This library also includes a command line tool named +datamosh+.
 It creates the keyframes removed video.
 
   $ datamosh /path/to/your.avi /path/to/broken.avi
 
 == Installation
 
-  gem sources -a http://gems.github.com
-  sudo gem install ucnv-aviglitch
+  gem install aviglitch
 
 == Copyright
 
-Copyright (c) 2009 ucnv. See LICENSE for details.
+Copyright (c) 2009 - 2010 ucnv. See LICENSE for details.
