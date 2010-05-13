@@ -135,10 +135,6 @@ class AviGlitch
           warn 'RIFF sign is not found' if debug
         end
         len = file.read(4).unpack('V').first
-        unless len + 8 == eof
-          answer = false
-          warn 'Length info is invalid' if debug
-        end
         unless file.read(4) == 'AVI '
           answer = false
           warn 'AVI sign is not found' if debug
