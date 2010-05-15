@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ucnv"]
   s.date = %q{2009-08-02}
-  s.default_executable = %q{datamoshing}
+  s.default_executable = %q{datamosh}
   s.email = %q{ucnvvv@gmail.com}
-  s.executables = ["datamoshing"]
+  s.executables = ["datamosh"]
   s.extra_rdoc_files = [
     "ChangeLog",
      "LICENSE",
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
-     "bin/datamoshing",
+     "bin/datamosh",
      "lib/aviglitch.rb",
      "lib/aviglitch/frame.rb",
      "lib/aviglitch/frames.rb",
