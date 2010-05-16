@@ -42,7 +42,7 @@ module AviGlitch
 
     ##
     # Output the glitched file to +path+, and close the file.
-    def write path
+    def output path
       FileUtils.cp @file.path, path
       close
     end
@@ -87,7 +87,7 @@ module AviGlitch
       end
     end
 
-    alias :output :write
+    alias :write :output
 
     def valid_target? target, frame # :nodoc:
       return true if target == :all

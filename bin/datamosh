@@ -22,4 +22,4 @@ a.glitch_with_index :keyframe do |frame, i|
     "\000" * frame.size
   end
 end
-a.write(output || 'out.avi')
+a.output(output || 'out.avi')

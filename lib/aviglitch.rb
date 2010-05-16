@@ -14,7 +14,7 @@ require 'aviglitch/frames'
 #       frame.data = frame.data.gsub(/\d/, '0')
 #     end
 #   end
-#   avi.write '/path/to/broken.avi'
+#   avi.output '/path/to/broken.avi'
 #
 # Using the method glitch, it can be written like:
 #
@@ -22,7 +22,7 @@ require 'aviglitch/frames'
 #   avi.glitch(:keyframe) do |data|
 #     data.gsub(/\d/, '0')
 #   end
-#   avi.write '/path/to/broken.avi'
+#   avi.output '/path/to/broken.avi'
 #
 #--
 # It does not support AVI2, interleave format.

@@ -32,14 +32,14 @@ describe AviGlitch do
     avi.frames.each do |f|
       ;
     end
-    avi.write @out
+    avi.output @out
     FileUtils.cmp(@in, @out).should be true
 
     avi = AviGlitch.open @in
     avi.glitch do |d|
       d
     end
-    avi.write @out
+    avi.output @out
     FileUtils.cmp(@in, @out).should be true
   end
 
@@ -52,7 +52,7 @@ describe AviGlitch do
         f.data = f.data.gsub(/\d/, '0')
       end
     end
-    avi.write @out
+    avi.output @out
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
@@ -63,7 +63,7 @@ describe AviGlitch do
       n += 1
       kf.slice(10..kf.size)
     end
-    avi.write @out
+    avi.output @out
     i_size = File.stat(@in).size
     o_size = File.stat(@out).size
     o_size.should == i_size - (10 * n)
@@ -79,7 +79,7 @@ describe AviGlitch do
         kf
       end
     end
-    avi.write @out
+    avi.output @out
     i_size = File.stat(@in).size
     o_size = File.stat(@out).size
     o_size.should == i_size - (10 * 25)
@@ -94,7 +94,7 @@ describe AviGlitch do
       rem_count += 1
       nil
     end
-    avi.write @out
+    avi.output @out
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
     # frames length in the output file is correct
@@ -106,7 +106,7 @@ describe AviGlitch do
   it 'has some alias methods' do
     lambda {
       avi = AviGlitch.open @in
-      avi.output @out
+      avi.write @out
     }.should_not raise_error
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end

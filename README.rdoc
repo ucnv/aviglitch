@@ -22,11 +22,11 @@ See following urls for details;
 
   require 'aviglitch'
 
-  avi = AviGlitch.new('/path/to/your.avi')
+  avi = AviGlitch.open('/path/to/your.avi')
   avi.glitch(:keyframe) do |data|
     data.gsub(/\d/, '0')
   end
-  avi.write('/path/to/broken.avi')
+  avi.output('/path/to/broken.avi')
 
 This library also includes a command line tool named +datamosh+.
 It creates the keyframes removed video.
