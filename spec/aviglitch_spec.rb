@@ -18,19 +18,24 @@ describe AviGlitch do
 
   it 'raise an error against unsupported files' do
     lambda {
-      avi = AviGlitch.new __FILE__
+      avi = AviGlitch.open __FILE__
     }.should raise_error
   end
 
+  it 'returns AviGlitch::Base object through the method #open' do
+    avi = AviGlitch.open @in
+    avi.should be_kind_of AviGlitch::Base
+  end
+
   it 'saves the same file when nothing is changed' do
-    avi = AviGlitch.new @in
+    avi = AviGlitch.open @in
     avi.frames.each do |f|
       ;
     end
     avi.write @out
     FileUtils.cmp(@in, @out).should be true
 
-    avi = AviGlitch.new @in
+    avi = AviGlitch.open @in
     avi.glitch do |d|
       d
     end
@@ -39,7 +44,7 @@ describe AviGlitch do
   end
 
   it 'can manipulate each frame' do
-    avi = AviGlitch.new @in
+    avi = AviGlitch.open @in
     f = avi.frames
     f.should be_kind_of Enumerable
     avi.frames.each do |f|
@@ -48,11 +53,11 @@ describe AviGlitch do
       end
     end
     avi.write @out
-    AviGlitch.surely_formatted?(@out, true).should be true
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
   it 'can glitch each keyframe' do
-    avi = AviGlitch.new @in
+    avi = AviGlitch.open @in
     n = 0
     avi.glitch :keyframe do |kf|
       n += 1
@@ -62,11 +67,11 @@ describe AviGlitch do
     i_size = File.stat(@in).size
     o_size = File.stat(@out).size
     o_size.should == i_size - (10 * n)
-    AviGlitch.surely_formatted?(@out, true).should be true
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
   it 'can glitch each keyframe with index' do
-    avi = AviGlitch.new @in
+    avi = AviGlitch.open @in
     avi.glitch_with_index :keyframe do |kf, idx|
       if idx < 25
         kf.slice(10..kf.size)
@@ -78,11 +83,11 @@ describe AviGlitch do
     i_size = File.stat(@in).size
     o_size = File.stat(@out).size
     o_size.should == i_size - (10 * 25)
-    AviGlitch.surely_formatted?(@out, true).should be true
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
   it 'can remove a frame with returning nil' do
-    avi = AviGlitch.new @in
+    avi = AviGlitch.open @in
     in_frame_size = avi.frames.size
     rem_count = 0
     avi.glitch :keyframe do |kf|
@@ -90,10 +95,10 @@ describe AviGlitch do
       nil
     end
     avi.write @out
-    AviGlitch.surely_formatted?(@out, true).should be true
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
 
     # frames length in the output file is correct
-    avi = AviGlitch.new @out
+    avi = AviGlitch.open @out
     out_frame_size = avi.frames.size
     out_frame_size.should == in_frame_size - rem_count
   end
@@ -103,7 +108,6 @@ describe AviGlitch do
       avi = AviGlitch.open @in
       avi.output @out
     }.should_not raise_error
-    AviGlitch.surely_formatted?(@out, true).should be true
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
-
 end

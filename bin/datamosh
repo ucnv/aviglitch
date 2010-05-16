@@ -14,7 +14,7 @@ end
 
 input, output = ARGV
 
-a = AviGlitch.new input
+a = AviGlitch.open input
 a.glitch_with_index :keyframe do |frame, i|
   if i == 0  # keep the first frame
     frame

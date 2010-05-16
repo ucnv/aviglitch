@@ -1,4 +1,4 @@
-class AviGlitch
+module AviGlitch
 
   # Frames provides the interface to access each frame
   # in the AVI file.

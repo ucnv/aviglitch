@@ -1,4 +1,4 @@
-class AviGlitch
+module AviGlitch
   
   # Frame is the struct of the frame data and meta-data.
   # You can access this class through AviGlitch::Frames.
