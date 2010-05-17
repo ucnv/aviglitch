@@ -1,25 +1,51 @@
 #!/usr/bin/env ruby
 # Generate datamoshing
 
+require 'optparse'
 require 'rubygems'
 require 'aviglitch'
 
-if ARGV.size < 1 || ARGV.first == '--help'
-  puts <<-BANNER.gsub(/^\s+/, '')
-    Usage: #{File.basename $0} INPUT [OUTPUT]
-    Generate a datamoshing video from INPUT to OUTPUT (./out.avi by default).
-  BANNER
-  exit 0
+output = './out.avi'
+all = false
+force = false
+
+opts = OptionParser.new do |opts|
+  opts.banner = "datamosh - AviGlitch's datamoshing video generator."
+  opts.define_head "Usage: #{File.basename($0)} <input> [options]"
+  opts.separator "Options:"
+  opts.on("-o", "--output [OUTPUT]", 
+    "Output the video to OUTPUT (./out.avi by default)") do |f|
+    output = f
+  end
+  opts.on("-f", "--force", "Overwrite an existing output file") do
+    force = true
+  end
+  opts.on("-a", "--all", 
+    "Remove all keyframes (It remains a first keyframe by default)") do
+    all = true
+  end
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end
+input = opts.parse!
+if input.empty?
+  puts opts
+  exit 1
+end
+if !force && File.exists?(output)
+  puts "!!! `#{output}' already exists. Use -f option to overwrite."
+  exit 1
 end
 
-input, output = ARGV
-
-a = AviGlitch.open input
+a = AviGlitch.open input.first
 a.glitch_with_index :keyframe do |frame, i|
-  if i == 0  # keep the first frame
+  if !all && i == 0  # keep the first frame
     frame
   else
     "\000" * frame.size
   end
 end
-a.output(output || 'out.avi')
+a.output(output)
+
