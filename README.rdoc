@@ -16,7 +16,7 @@ See following urls for details;
 
 * Not supports AVI2 files right now.
 * Not supports files with interleave.
-* Parses only container level structure, not parses codecs.
+* Parses only container level structure, doesn't parse codecs.
 
 == Synopsis
 
