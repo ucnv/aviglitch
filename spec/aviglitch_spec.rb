@@ -121,4 +121,24 @@ describe AviGlitch do
     avi.close
     count.should > 0
   end
+
+  it 'should close file when output' do
+    avi = AviGlitch.open @in
+    avi.output @out
+    lambda {
+      avi.glitch do |f|
+        f
+      end
+    }.should raise_error(IOError)
+  end
+
+  it 'can explicit close file' do
+    avi = AviGlitch.open @in
+    avi.close
+    lambda {
+      avi.glitch do |f|
+        f
+      end
+    }.should raise_error(IOError)
+  end
 end
