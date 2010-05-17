@@ -92,7 +92,7 @@ module AviGlitch
     def valid_target? target, frame # :nodoc:
       return true if target == :all
       begin
-        frame.send "is_#{target.to_s}?"
+        frame.send "is_#{target.to_s.sub(/frames$/, 'frame')}?"
       rescue
         false
       end

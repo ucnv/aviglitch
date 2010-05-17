@@ -110,4 +110,15 @@ describe AviGlitch do
     }.should_not raise_error
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
+
+  it 'can glitch with :*frames instead of :*frame' do
+    avi = AviGlitch.open @in
+    count = 0
+    avi.glitch :keyframes do |kf|
+      count += 1
+      kf
+    end
+    avi.close
+    count.should > 0
+  end
 end
