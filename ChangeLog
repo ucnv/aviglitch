@@ -1,3 +1,11 @@
+== 0.0.2 / 2010-05-17
+
+* Removed AviGlitch#new. Use AviGlitch#open instead of #new.
+* Added warning for a large file.
+* Changed datamosh command interface.
+* Changed the library file layout.
+* And tiny internal changes.
+
 == 0.0.1 / 2009-08-01
 
 * initial release
