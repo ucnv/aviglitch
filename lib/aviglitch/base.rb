@@ -67,12 +67,14 @@ module AviGlitch
     # It also requires a block. In the block, you take the frame data
     # as a String parameter.
     # To modify the data, simply return a modified data.
+    # It returns +self+
     def glitch target = :all, &block  # :yield: data
       frames.each do |frame|
         if valid_target? target, frame
           frame.data = yield frame.data
         end
       end
+      self
     end
 
     ##
@@ -85,6 +87,7 @@ module AviGlitch
           i += 1
         end
       end
+      self
     end
 
     alias :write :output

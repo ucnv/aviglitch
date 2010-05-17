@@ -141,4 +141,11 @@ describe AviGlitch do
       end
     }.should raise_error(IOError)
   end
+
+  it 'offers one liner style coding' do
+    lambda {
+      AviGlitch.open(@in).glitch(:keyframe){|d| '0' * d.size}.output(@out)
+    }.should_not raise_error
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
 end
