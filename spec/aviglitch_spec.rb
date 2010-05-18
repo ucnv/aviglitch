@@ -29,31 +29,11 @@ describe AviGlitch do
 
   it 'saves the same file when nothing is changed' do
     avi = AviGlitch.open @in
-    avi.frames.each do |f|
-      ;
-    end
-    avi.output @out
-    FileUtils.cmp(@in, @out).should be true
-
-    avi = AviGlitch.open @in
     avi.glitch do |d|
       d
     end
     avi.output @out
     FileUtils.cmp(@in, @out).should be true
-  end
-
-  it 'can manipulate each frame' do
-    avi = AviGlitch.open @in
-    f = avi.frames
-    f.should be_kind_of Enumerable
-    avi.frames.each do |f|
-      if f.is_keyframe?
-        f.data = f.data.gsub(/\d/, '0')
-      end
-    end
-    avi.output @out
-    AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
   it 'can glitch each keyframe' do
@@ -84,23 +64,6 @@ describe AviGlitch do
     o_size = File.stat(@out).size
     o_size.should == i_size - (10 * 25)
     AviGlitch::Base.surely_formatted?(@out, true).should be true
-  end
-
-  it 'can remove a frame with returning nil' do
-    avi = AviGlitch.open @in
-    in_frame_size = avi.frames.size
-    rem_count = 0
-    avi.glitch :keyframe do |kf|
-      rem_count += 1
-      nil
-    end
-    avi.output @out
-    AviGlitch::Base.surely_formatted?(@out, true).should be true
-
-    # frames length in the output file is correct
-    avi = AviGlitch.open @out
-    out_frame_size = avi.frames.size
-    out_frame_size.should == in_frame_size - rem_count
   end
 
   it 'has some alias methods' do
