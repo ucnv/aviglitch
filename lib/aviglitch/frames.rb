@@ -49,7 +49,7 @@ module AviGlitch
         @io.pos = @pos_of_movi + m[:offset] + 8
         frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
         yield frame
-        unless frame.data.nil? || frame.data.to_s.empty?
+        unless frame.data.nil?
           m[:offset] = temp.pos
           m[:size] = frame.data.size
           temp.print m[:id]
