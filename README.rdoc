@@ -1,6 +1,6 @@
 = AviGlitch
 
-* http://github.com/ucnv/aviglitch/tree/master
+* http://github.com/ucnv/aviglitch
 
 == Description
 
