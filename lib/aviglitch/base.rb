@@ -125,7 +125,7 @@ module AviGlitch
       r
     end
 
-    private_instance_methods [:valid_target?, :is_safe_frames_count?]
+    private :valid_target?, :safe_frames_count?
 
     class << self
       ##
