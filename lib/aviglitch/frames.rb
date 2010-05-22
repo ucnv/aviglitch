@@ -61,15 +61,22 @@ module AviGlitch
           false
         end
       end
+      overwrite temp
+      temp.close true
+    end
 
+    def size
+      @meta.size
+    end
+
+    def overwrite data
       # Overwrite the file
       @io.pos = @pos_of_movi - 4
-      @io.print [temp.pos].pack('V')
-      temp.rewind
-      while d = temp.read(1024) do
+      @io.print [data.pos].pack('V')
+      data.rewind
+      while d = data.read(1024) do
         @io.print d
       end
-      temp.close true
       @io.print 'idx1'
       @io.print [@meta.size * 16].pack('V')
       @meta.each do |m|
@@ -86,12 +93,8 @@ module AviGlitch
       ## frame count
       @io.pos = 48
       @io.print [@meta.size].pack('V')
-
     end
 
-    def size
-      @meta.size
-    end
-
+    private_instance_methods [:overwrite]
   end
 end
