@@ -102,7 +102,11 @@ module AviGlitch
       @io.print [eof - 8].pack('V')
       ## frame count
       @io.pos = 48
-      @io.print [@meta.size].pack('V')
+      vid_frames = @meta.select do |m|
+        id = m[:id]
+        id[2, 2] == 'db' || id[2, 2] == 'dc'
+      end
+      @io.print [vid_frames.size].pack('V')
 
       @io.pos
     end

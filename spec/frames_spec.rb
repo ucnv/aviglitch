@@ -12,13 +12,6 @@ describe AviGlitch::Frames do
         @io.pos = pos
         id
       end
-      define_method(:frames_count_in_header) do
-        pos = @io.pos
-        @io.pos = 48
-        s = @io.read 4
-        @io.pos = pos
-        s.unpack('V').first
-      end
     end
 
     FileUtils.mkdir OUTPUT_DIR unless File.exist? OUTPUT_DIR
@@ -101,6 +94,19 @@ describe AviGlitch::Frames do
     avi.close
   end
 
+  it 'should save video frames count in header' do
+    avi = AviGlitch.open @in
+    c = 0
+    avi.frames.each do |f|
+      c += 1 if f.is_videoframe?
+    end
+    avi.output @out
+    open(@out) do |f|
+      f.pos = 48
+      f.read(4).unpack('V').first.should == c
+    end
+  end
+
   it 'can concat with other Frames instance with #concat, destructively' do
     a = AviGlitch.open @in
     b = AviGlitch.open @in
@@ -111,16 +117,11 @@ describe AviGlitch::Frames do
     }.should raise_error(TypeError)
     a.frames.concat(b.frames)
     a.frames.size.should == asize + bsize
-    a.frames.frames_count_in_header.should == asize + bsize
     b.frames.size.should == bsize
     a.output @out
     b.close
 
     AviGlitch::Base.surely_formatted?(@out, true).should be true
-    open(@out) { |f|
-      f.pos = 48
-      x = f.read(4).unpack('V').first
-    }.should == (asize + bsize)
   end
 
   it 'can concat with other Frames instance with +' do
