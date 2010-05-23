@@ -18,6 +18,8 @@ module AviGlitch
   class Frames
     include Enumerable
 
+    attr_reader :meta
+
     def initialize io
       io.rewind
       io.pos = 12 # /^RIFF[\s\S]{4}AVI $/
@@ -44,23 +46,7 @@ module AviGlitch
 
     def each
       temp = Tempfile.new 'frames'
-      temp.print 'movi'
-      @meta = @meta.select do |m|
-        @io.pos = @pos_of_movi + m[:offset] + 8
-        frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
-        yield frame
-        unless frame.data.nil?
-          m[:offset] = temp.pos
-          m[:size] = frame.data.size
-          temp.print m[:id]
-          temp.print [frame.data.size].pack('V')
-          temp.print frame.data
-          temp.print "\000" if frame.data.size % 2 == 1
-          true
-        else
-          false
-        end
-      end
+      frames_data_as_io(temp, Proc.new)
       overwrite temp
       temp.close true
     end
@@ -69,10 +55,34 @@ module AviGlitch
       @meta.size
     end
 
-    def overwrite data
+    def frames_data_as_io(io = nil, block = nil) #:nodoc:
+      io = Tempfile.new('tmep') if io.nil?
+      @meta = @meta.select do |m|
+        @io.pos = @pos_of_movi + m[:offset] + 8   # 8 for id and size
+        frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
+        block.call(frame) if block    # accept the variable block as Proc
+        yield frame if block_given?   # or a given block (or do nothing)
+        unless frame.data.nil?
+          m[:offset] = io.pos + 4   # 4 for 'movi'
+          m[:size] = frame.data.size
+          io.print m[:id]
+          io.print [frame.data.size].pack('V')
+          io.print frame.data
+          io.print "\000" if frame.data.size % 2 == 1
+          true
+        else
+          false
+        end
+      end
+      io
+    end
+
+    def overwrite data  #:nodoc:
       # Overwrite the file
-      @io.pos = @pos_of_movi - 4
-      @io.print [data.pos].pack('V')
+      data.seek 0, IO::SEEK_END
+      @io.pos = @pos_of_movi - 4  # 4 for size
+      @io.print [data.pos + 4].pack('V')  # 4 for 'movi'
+      @io.print 'movi'
       data.rewind
       while d = data.read(1024) do
         @io.print d
@@ -93,8 +103,61 @@ module AviGlitch
       ## frame count
       @io.pos = 48
       @io.print [@meta.size].pack('V')
+
+      @io.pos
     end
 
-    private_instance_methods [:overwrite]
+    def concat other_frames
+      raise TypeError unless other_frames.kind_of?(Frames)
+      # data
+      this_data = Tempfile.new 'this'
+      self.frames_data_as_io this_data
+      other_data = Tempfile.new 'other'
+      other_frames.frames_data_as_io other_data
+      this_data.seek 0, IO::SEEK_END
+      this_size = this_data.pos
+      other_data.rewind
+      while d = other_data.read(1024) do
+        this_data.print d
+      end
+      other_data.close true
+      # meta
+      other_meta = other_frames.meta
+      other_meta.collect! do |m|
+        m[:offset] += this_size
+        m
+      end
+      @meta.concat other_meta
+      # close
+      overwrite this_data
+      this_data.close true
+    end
+
+    def + other_frames
+      r = AviGlitch.open @io.path
+      r.frames.concat other_frames
+      r
+    end
+
+    def slice *args
+      b, l = args
+      if args.first.kind_of? Range
+        r = args.first
+        b = r.begin
+        l = r.end - r.begin
+      end
+      e = b + l - 1
+
+      r = AviGlitch.open @io.path
+      r.frames.each_with_index do |f, i|
+        unless i >= b && i <= e
+          f.data = nil
+        end
+      end
+      r.frames
+    end
+
+    protected :frames_data_as_io, :meta
+    private :overwrite
   end
 end

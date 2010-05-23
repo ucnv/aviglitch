@@ -16,18 +16,18 @@ describe AviGlitch do
     FileUtils.rmdir OUTPUT_DIR
   end
 
-  it 'raise an error against unsupported files' do
+  it 'should raise an error against unsupported files' do
     lambda {
       avi = AviGlitch.open __FILE__
     }.should raise_error
   end
 
-  it 'returns AviGlitch::Base object through the method #open' do
+  it 'should return AviGlitch::Base object through the method #open' do
     avi = AviGlitch.open @in
     avi.should be_kind_of AviGlitch::Base
   end
 
-  it 'saves the same file when nothing is changed' do
+  it 'should save the same file when nothing is changed' do
     avi = AviGlitch.open @in
     avi.glitch do |d|
       d
@@ -66,7 +66,7 @@ describe AviGlitch do
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
-  it 'has some alias methods' do
+  it 'should have some alias methods' do
     lambda {
       avi = AviGlitch.open @in
       avi.write @out
@@ -105,10 +105,44 @@ describe AviGlitch do
     }.should raise_error(IOError)
   end
 
-  it 'offers one liner style coding' do
+  it 'should offer one liner style coding' do
     lambda {
       AviGlitch.open(@in).glitch(:keyframe){|d| '0' * d.size}.output(@out)
     }.should_not raise_error
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
+
+  it 'should not raise error in multiple glitches' do
+    lambda {
+      avi = AviGlitch.open @in
+      avi.glitch(:keyframe) do |d|
+        d.gsub(/\d/, '')
+      end
+      avi.glitch(:keyframe) do |d|
+        nil
+      end
+      avi.glitch(:audioframe) do |d|
+        d * 2
+      end
+      avi.output @out
+    }.should_not raise_error
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
+  it 'can work with another frames instance' do
+    pending("later") {
+    a = AviGlitch.open @in
+    a.glitch :keyframe do |d|
+      nil
+    end
+    a.output(@out.to_s + 'x.avi')
+    b = AviGlitch.open @in
+    c = AviGlitch.open(@out.to_s + 'x.avi')
+    b.frames = c.frames
+    b.output @out
+
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+    }
+  end
+
 end
