@@ -130,7 +130,6 @@ describe AviGlitch do
   end
 
   it 'can work with another frames instance' do
-    pending("later") {
     a = AviGlitch.open @in
     a.glitch :keyframe do |d|
       nil
@@ -142,7 +141,6 @@ describe AviGlitch do
     b.output @out
 
     AviGlitch::Base.surely_formatted?(@out, true).should be true
-    }
   end
 
 end

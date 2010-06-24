@@ -69,7 +69,7 @@ module AviGlitch
     # To modify the data, simply return a modified data.
     # It returns +self+
     def glitch target = :all, &block  # :yield: data
-      frames.each do |frame|
+      @frames.each do |frame|
         if valid_target? target, frame
           frame.data = yield frame.data
         end
@@ -81,7 +81,7 @@ module AviGlitch
     # Do glitch with index.
     def glitch_with_index target = :all, &block  # :yield: data, index
       i = 0
-      frames.each do |frame|
+      @frames.each do |frame|
         if valid_target? target, frame
           frame.data = yield(frame.data, i)
           i += 1
@@ -91,6 +91,14 @@ module AviGlitch
     end
 
     alias :write :output
+
+    ##
+    # Swap the frames with other Frames data.
+    def frames= other
+      raise TypeError unless other.kind_of?(Frames)
+      @frames = @frames.slice(0, 0)
+      @frames.concat other
+    end
 
     def valid_target? target, frame # :nodoc:
       return true if target == :all
@@ -117,10 +125,10 @@ module AviGlitch
         end
         m = ["WARNING: The passed file has too many frames (#{fc}).\n",
           "It may use a large memory to process. ",
-            "We recommend to chop the movie to smaller chunks before you glitch.\n",
-            "Do you want to continue anyway? [yN] "].join('')
-          a = Readline.readline m
-          r = a == 'y'
+          "We recommend to chop the movie to smaller chunks before you glitch.\n",
+          "Do you want to continue anyway? [yN] "].join('')
+        a = Readline.readline m
+        r = a == 'y'
       end
       r
     end

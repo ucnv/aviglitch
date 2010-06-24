@@ -34,9 +34,13 @@ module AviGlitch
   class << self
     ##
     # Returns AviGlitch::Base instance.
-    # It requires +path+ as String or Pathname.
-    def AviGlitch.open path
-      AviGlitch::Base.new(Pathname(path))
+    # It requires +path_or_frames+ as String or Pathname, or Frames instance.
+    def AviGlitch.open path_or_frames
+      if path_or_frames.kind_of?(Frames)
+        path_or_frames.to_avi
+      else
+        AviGlitch::Base.new(Pathname(path_or_frames))
+      end
     end
   end
 end

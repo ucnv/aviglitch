@@ -107,6 +107,15 @@ describe AviGlitch::Frames do
     end
   end
 
+  it 'can generate AviGlitch::Base instance' do
+    a = AviGlitch.open @in
+    b = a.frames.slice(0, 10)
+    c = b.to_avi
+    c.should be_kind_of AviGlitch::Base
+    c.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
   it 'can concat with other Frames instance with #concat, destructively' do
     a = AviGlitch.open @in
     b = AviGlitch.open @in
@@ -132,10 +141,12 @@ describe AviGlitch::Frames do
     c = a.frames + b.frames
     a.frames.size.should == asize
     b.frames.size.should == bsize
-    c.frames.size.should == asize + bsize
+    c.should be_kind_of AviGlitch::Frames
+    c.size.should == asize + bsize
     a.close
     b.close
-    c.output @out
+    d = AviGlitch.open c
+    d.output @out
 
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
@@ -178,8 +189,18 @@ describe AviGlitch::Frames do
     }.should_not raise_error
   end
 
+  it 'can concat repeatedly the same sliced frames' do
+    a = AviGlitch.open @in
+    b = a.frames.slice(0, 5)
+    c = a.frames.slice(0, 10)
+    10.times do
+      b.concat(c)
+    end
+    b.size.should == 5 + (10 * 10)
+  end
+
   it 'should implement other Array like methods' do
-    # silice(n) slice! at first last push insert << delete_at [] ...
+    # slice(n) slice! at first last push insert << delete_at [] ...
     pending("later") {
       violate "not implemented."
     }

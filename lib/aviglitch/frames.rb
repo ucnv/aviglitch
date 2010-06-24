@@ -126,10 +126,10 @@ module AviGlitch
       end
       other_data.close true
       # meta
-      other_meta = other_frames.meta
-      other_meta.collect! do |m|
-        m[:offset] += this_size
-        m
+      other_meta = other_frames.meta.collect do |m|
+        x = m.dup
+        x[:offset] += this_size
+        x
       end
       @meta.concat other_meta
       # close
@@ -138,9 +138,9 @@ module AviGlitch
     end
 
     def + other_frames
-      r = AviGlitch.open @io.path
+      r = self.to_avi  # futile instance...
       r.frames.concat other_frames
-      r
+      r.frames
     end
 
     def slice *args
@@ -159,6 +159,12 @@ module AviGlitch
         end
       end
       r.frames
+    end
+
+    ##
+    # Generate new AviGlitch::Base instance using self.
+    def to_avi
+      AviGlitch.open @io.path
     end
 
     protected :frames_data_as_io, :meta
