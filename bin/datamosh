@@ -7,7 +7,6 @@ require 'aviglitch'
 
 output = './out.avi'
 all = false
-force = false
 
 opts = OptionParser.new do |opts|
   opts.banner = "datamosh - AviGlitch's datamoshing video generator."
@@ -16,9 +15,6 @@ opts = OptionParser.new do |opts|
   opts.on("-o", "--output [OUTPUT]", 
     "Output the video to OUTPUT (./out.avi by default)") do |f|
     output = f
-  end
-  opts.on("-f", "--force", "Overwrite an existing output file") do
-    force = true
   end
   opts.on("-a", "--all", 
     "Remove all keyframes (It remains a first keyframe by default)") do
@@ -29,23 +25,29 @@ opts = OptionParser.new do |opts|
     exit
   end
 end
+
 input = opts.parse!
 if input.empty?
   puts opts
   exit 1
 end
-if !force && File.exists?(output)
-  puts "!!! `#{output}' already exists. Use -f option to overwrite."
-  exit 1
-end
 
-a = AviGlitch.open input.first
-a.glitch_with_index :keyframe do |frame, i|
-  if !all && i == 0  # keep the first frame
-    frame
+ag = nil
+input.each do |file|
+  a = AviGlitch.open file
+  a.glitch_with_index :keyframe do |frame, i|
+    if !all && ag.nil? && i == 0  # keep the first frame
+      frame
+    else
+      "\000" * frame.size
+    end
+  end
+  if ag.nil?
+    ag = a
   else
-    "\000" * frame.size
+    ag.frames.concat a.frames
   end
 end
-a.output(output)
+
+ag.output(output)
 

@@ -382,6 +382,18 @@ describe AviGlitch::Frames do
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
+  it 'can repeat frames using *' do
+    a = AviGlitch.open @in
+
+    r = 20
+    b = a.frames.slice(10, 10)
+    c = b * r
+    c.size.should == 10 * r
+
+    c.to_avi.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
   it 'should manipulate frames like array does' do
     avi = AviGlitch.open @in
     a = avi.frames
@@ -425,6 +437,13 @@ describe AviGlitch::Frames do
     d = a.frames[0..9]
     d.should be_kind_of AviGlitch::Frames
     d.size.should == 10
+  end
+
+  it 'should return nil when getting a frame at out-of-range index' do
+    a = AviGlitch.open @in
+
+    x = a.frames.at(a.frames.size + 1)
+    x.should be_nil
   end
 
 

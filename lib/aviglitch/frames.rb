@@ -151,6 +151,15 @@ module AviGlitch
       r.frames
     end
 
+    def * times
+      result = self.slice 0, 0
+      frames = self.slice 0..-1
+      times.times do
+        result.concat frames
+      end
+      result
+    end
+
     def slice *args
       b, l = get_beginning_and_length *args
       if l.nil?
@@ -201,6 +210,7 @@ module AviGlitch
 
     def at n
       m = @meta[n]
+      return nil if m.nil?
       @io.pos = @pos_of_movi + m[:offset] + 8
       frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
       @io.rewind
