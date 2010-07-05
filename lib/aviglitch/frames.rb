@@ -1,3 +1,5 @@
+require 'stringio'
+
 module AviGlitch
 
   # Frames provides the interface to access each frame
@@ -111,6 +113,12 @@ module AviGlitch
       @io.pos
     end
 
+    def clear
+      @meta = []
+      overwrite StringIO.new
+      self
+    end
+
     def concat other_frames
       raise TypeError unless other_frames.kind_of?(Frames)
       # data
@@ -138,27 +146,119 @@ module AviGlitch
     end
 
     def + other_frames
-      r = self.to_avi  # futile instance...
+      r = self.to_avi
       r.frames.concat other_frames
       r.frames
     end
 
     def slice *args
-      b, l = args
-      if args.first.kind_of? Range
-        r = args.first
-        b = r.begin
-        l = r.end - r.begin
-      end
-      e = b + l - 1
-
-      r = AviGlitch.open @io.path
-      r.frames.each_with_index do |f, i|
-        unless i >= b && i <= e
-          f.data = nil
+      b, l = get_beginning_and_length *args
+      if l.nil?
+        self.at b
+      else
+        e = b + l - 1
+        r = self.to_avi
+        r.frames.each_with_index do |f, i|
+          unless i >= b && i <= e
+            f.data = nil
+          end
         end
+        r.frames
       end
-      r.frames
+    end
+
+    alias :[] :slice
+
+    def slice! *args
+      b, l = get_beginning_and_length *args
+      head, sliced, tail = ()
+      sliced = l.nil? ? self.slice(b) : self.slice(b, l)
+      head = self.slice(0, b)
+      l = 1 if l.nil?
+      tail = self.slice((b + l)..-1)
+      self.clear
+      self.concat head + tail
+      sliced
+    end
+
+    def []= *args, value
+      b, l = get_beginning_and_length *args
+      ll = l.nil? ? 1 : l
+      head = self.slice(0, b)
+      rest = self.slice((b + ll)..-1)
+      if l.nil? || value.kind_of?(Frame)
+        head.push value
+      elsif value.kind_of?(Frames)
+        head.concat value
+      else
+        raise TypeError
+      end
+      new_frames = head + rest
+
+      self.clear
+      self.concat new_frames
+    end
+
+    def at n
+      m = @meta[n]
+      @io.pos = @pos_of_movi + m[:offset] + 8
+      frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
+      @io.rewind
+      frame
+    end
+
+    def first
+      self.slice(0)
+    end
+
+    def last
+      self.slice(self.size - 1)
+    end
+
+    def push frame
+      raise TypeError unless frame.kind_of? Frame
+      # data
+      this_data = Tempfile.new 'this'
+      self.frames_data_as_io this_data
+      this_data.seek 0, IO::SEEK_END
+      this_size = this_data.pos
+      this_data.print frame.id
+      this_data.print [frame.data.size].pack('V')
+      this_data.print frame.data
+      this_data.print "\000" if frame.data.size % 2 == 1
+      # meta
+      @meta << {
+        :id     => frame.id,
+        :flag   => frame.flag,
+        :offset => this_size + 4, # 4 for 'movi'
+        :size   => frame.data.size,
+      }
+      # close
+      overwrite this_data
+      this_data.close true
+      self
+    end
+
+    alias :<< :push
+
+    def insert n, *args
+      new_frames = self.slice(0, n)
+      args.each do |f|
+        new_frames.push f
+      end
+      new_frames.concat self.slice(n..-1)
+
+      self.clear
+      self.concat new_frames
+      self
+    end
+
+    def delete_at n
+      self.slice! n
+    end
+
+    def == other
+      @meta == other.meta
     end
 
     ##
@@ -167,7 +267,19 @@ module AviGlitch
       AviGlitch.open @io.path
     end
 
+    def get_beginning_and_length *args #:nodoc:
+      b, l = args
+      if args.first.kind_of? Range
+        r = args.first
+        b = r.begin
+        e = r.end >= 0 ? r.end : @meta.size + r.end
+        l = e - b + 1
+      end
+      b = b >= 0 ? b : @meta.size + b
+      [b, l]
+    end
+
     protected :frames_data_as_io, :meta
-    private :overwrite
+    private :overwrite, :get_beginning_and_length
   end
 end

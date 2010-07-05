@@ -107,6 +107,12 @@ describe AviGlitch::Frames do
     end
   end
 
+  it 'should evaluate the equality with owned contents' do
+    a = AviGlitch.open @in
+    b = AviGlitch.open @in
+    a.frames.should == b.frames
+  end
+
   it 'can generate AviGlitch::Base instance' do
     a = AviGlitch.open @in
     b = a.frames.slice(0, 10)
@@ -183,10 +189,28 @@ describe AviGlitch::Frames do
     range = spos..(spos + c)
     b = a.slice(range)
     b.should be_kind_of AviGlitch::Frames
-    b.size.should == c
+    b.size.should == c + 1
     lambda {
       b.each {|x| x }
     }.should_not raise_error
+
+    range = spos..-1
+    d = a.slice(range)
+    d.should be_kind_of AviGlitch::Frames
+    d.size.should == asize - spos
+    lambda {
+      d.each {|x| x }
+    }.should_not raise_error
+
+    x = -5
+    range = spos..x
+    e = a.slice(range)
+    e.should be_kind_of AviGlitch::Frames
+    e.size.should == asize - spos + x + 1
+    lambda {
+      e.each {|x| x }
+    }.should_not raise_error
+
   end
 
   it 'can concat repeatedly the same sliced frames' do
@@ -199,11 +223,209 @@ describe AviGlitch::Frames do
     b.size.should == 5 + (10 * 10)
   end
 
-  it 'should implement other Array like methods' do
-    # slice(n) slice! at first last push insert << delete_at [] ...
-    pending("later") {
-      violate "not implemented."
-    }
+  it 'can get one single frame using slice(n)' do
+    a = AviGlitch.open @in
+    pos = 10
+    b = nil
+    a.frames.each_with_index do |f, i|
+      b = f if i == pos
+    end
+    c = a.frames.slice(pos)
+    c.should be_kind_of AviGlitch::Frame
+    c.data.should == b.data
   end
+
+  it 'can get one single frame using at(n)' do
+    a = AviGlitch.open @in
+    pos = 10
+    b = nil
+    a.frames.each_with_index do |f, i|
+      b = f if i == pos
+    end
+    c = a.frames.at(pos)
+    c.should be_kind_of AviGlitch::Frame
+    c.data.should == b.data
+  end
+
+  it 'can get a first frame ussing first, a last frame using last' do
+    a = AviGlitch.open @in
+    b0 = c0 = nil
+    a.frames.each_with_index do |f, i|
+      b0 = f if i == 0
+      c0 = f if i == a.frames.size - 1
+    end
+    b1 = a.frames.first
+    c1 = a.frames.last
+
+    b1.data.should == b0.data
+    c1.data.should == c0.data
+  end
+
+  it 'can add a frame at last using push' do
+    a = AviGlitch.open @in
+    s = a.frames.size
+    b = a.frames[10]
+    lambda {
+      a.frames.push 100
+    }.should raise_error(TypeError)
+    c = a.frames + a.frames.slice(10, 1)
+
+    x = a.frames.push b
+    a.frames.size.should == s + 1
+    x.should == a.frames
+    a.frames.should == c
+    a.frames.last.data.should == c.last.data
+    x = a.frames.push b
+    a.frames.size.should == s + 2
+    x.should == a.frames
+
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
+  it 'can add a frame at last using <<' do
+    a = AviGlitch.open @in
+    s = a.frames.size
+    b = a.frames[10]
+
+    x = a.frames << b
+    a.frames.size.should == s + 1
+    x.should == a.frames
+
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
+  it 'can delete all frames using clear' do
+    a = AviGlitch.open @in
+    a.frames.clear
+    a.frames.size.should == 0
+  end
+
+  it 'can delete one frame using delete_at' do
+    a = AviGlitch.open @in
+    l = a.frames.size
+    b = a.frames[10]
+    c = a.frames[11]
+    x = a.frames.delete_at 10
+
+    x.data.should == b.data
+    a.frames[10].data.should == c.data
+    a.frames.size.should == l - 1
+
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
+  it 'can insert one frame into other frames using insert' do
+    a = AviGlitch.open @in
+    l = a.frames.size
+    b = a.frames[10]
+    x = a.frames.insert 5, b
+
+    x.should == a.frames
+    a.frames[5].data.should == b.data
+    a.frames[11].data.should == b.data
+    a.frames.size.should == l + 1
+
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
+  it 'can slice frames destructively using slice!' do
+    a = AviGlitch.open @in
+    l = a.frames.size
+
+    b = a.frames.slice!(10)
+    b.should be_kind_of AviGlitch::Frame
+    a.frames.size.should == l - 1
+
+    c = a.frames.slice!(0, 10)
+    c.should be_kind_of AviGlitch::Frames
+    a.frames.size.should == l - 1 - 10
+
+    d = a.frames.slice!(0..9)
+    d.should be_kind_of AviGlitch::Frames
+    a.frames.size.should == l - 1 - 10 - 10
+  end
+
+  it 'can swap frame(s) using []=' do
+    a = AviGlitch.open @in
+    l = a.frames.size
+    lambda {
+      a.frames[10] = "xxx"
+    }.should raise_error(TypeError)
+
+    b = a.frames[20]
+    a.frames[10] = b
+    a.frames.size.should == l
+    a.frames[10].data.should == b.data
+
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+
+    a = AviGlitch.open @in
+    pl = 5
+    pp = 3
+    b = a.frames[20, pl]
+    a.frames[10..(10 + pp)] = b
+    a.frames.size.should == l - pp + pl - 1
+    pp.times do |i|
+      a.frames[10 + i].data.should == b[i].data
+    end
+
+    lambda {
+      a.frames[10] = a.frames.slice(100, 1)
+    }.should raise_error(TypeError)
+
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+  end
+
+  it 'should manipulate frames like array does' do
+    avi = AviGlitch.open @in
+    a = avi.frames
+    x = Array.new a.size
+
+    fa = a.slice(0, 100)
+    fx = x.slice(0, 100)
+    fa.size.should == fx.size
+
+    fa = a.slice(100..-1)
+    fx = x.slice(100..-1)
+    fa.size.should == fx.size
+
+    fa = a.slice(100..-10)
+    fx = x.slice(100..-10)
+    fa.size.should == fx.size
+
+    fa = a.slice(-200, 10)
+    fx = x.slice(-200, 10)
+    fa.size.should == fx.size
+
+    a[100] = a.at 200
+    x[100] = x.at 200
+    a.size.should == x.size
+
+    a[100..150] = a.slice(100, 100)
+    x[100..150] = x.slice(100, 100)
+    a.size.should == x.size
+  end
+
+  it 'should have the method alias to slice as []' do
+    a = AviGlitch.open @in
+
+    b = a.frames[10]
+    b.should be_kind_of AviGlitch::Frame
+
+    c = a.frames[0, 10]
+    c.should be_kind_of AviGlitch::Frames
+    c.size.should == 10
+
+    d = a.frames[0..9]
+    d.should be_kind_of AviGlitch::Frames
+    d.size.should == 10
+  end
+
 
 end

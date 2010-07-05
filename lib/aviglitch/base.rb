@@ -96,7 +96,7 @@ module AviGlitch
     # Swap the frames with other Frames data.
     def frames= other
       raise TypeError unless other.kind_of?(Frames)
-      @frames = @frames.slice(0, 0)
+      @frames.clear
       @frames.concat other
     end
 
