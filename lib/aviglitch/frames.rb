@@ -14,7 +14,7 @@ module AviGlitch
   #     frame.data = frame.data.gsub(/\d/, '0')
   #   end
   #
-  # In the block passed into iteration method, the parameter is the reference
+  # In the block passed into iteration method, the parameter is a reference
   # of AviGlitch::Frame object.
   #
   class Frames
@@ -22,6 +22,8 @@ module AviGlitch
 
     attr_reader :meta
 
+    ##
+    # Creates a new AviGlitch::Frames object.
     def initialize io
       io.rewind
       io.pos = 12 # /^RIFF[\s\S]{4}AVI $/
@@ -46,6 +48,8 @@ module AviGlitch
       @io = io
     end
 
+    ##
+    # Enumerates the frames.
     def each
       temp = Tempfile.new 'frames'
       frames_data_as_io(temp, Proc.new)
@@ -53,6 +57,8 @@ module AviGlitch
       temp.close true
     end
 
+    ##
+    # Returns the number of frames.
     def size
       @meta.size
     end
@@ -113,12 +119,17 @@ module AviGlitch
       @io.pos
     end
 
+    ##
+    # Removes all frames and returns self.
     def clear
       @meta = []
       overwrite StringIO.new
       self
     end
 
+    ##
+    # Appends the frames in the other Frames into the tail of self.
+    # It is destructive like Array does.
     def concat other_frames
       raise TypeError unless other_frames.kind_of?(Frames)
       # data
@@ -145,12 +156,17 @@ module AviGlitch
       this_data.close true
     end
 
+    ##
+    # Returns a concatenation of the two Frames as a new Frames instance.
     def + other_frames
       r = self.to_avi
       r.frames.concat other_frames
       r.frames
     end
 
+    ##
+    # Returns the new Frames as a +times+ times repeated concatenation
+    # of the original Frames.
     def * times
       result = self.slice 0, 0
       frames = self.slice 0..-1
@@ -160,6 +176,11 @@ module AviGlitch
       result
     end
 
+    ##
+    # Returns the Frame object at the given index or
+    # returns new Frames object that sliced with the given index and length
+    # or with the Range.
+    # Just like Array.
     def slice *args
       b, l = get_beginning_and_length *args
       if l.nil?
@@ -176,8 +197,13 @@ module AviGlitch
       end
     end
 
+    ##
+    # Alias for slice
     alias :[] :slice
 
+    ##
+    # Removes frame(s) at the given index or the range (same as slice).
+    # Returns the new Frames contains removed frames.
     def slice! *args
       b, l = get_beginning_and_length *args
       head, sliced, tail = ()
@@ -190,6 +216,9 @@ module AviGlitch
       sliced
     end
 
+    ##
+    # Removes frame(s) at the given index or the range (same as []).
+    # Inserts the given Frame or Frames's contents into the removed index.
     def []= *args, value
       b, l = get_beginning_and_length *args
       ll = l.nil? ? 1 : l
@@ -208,6 +237,8 @@ module AviGlitch
       self.concat new_frames
     end
 
+    ##
+    # Returns one Frame object at the given index.
     def at n
       m = @meta[n]
       return nil if m.nil?
@@ -217,14 +248,20 @@ module AviGlitch
       frame
     end
 
+    ##
+    # Returns the first Frame object.
     def first
       self.slice(0)
     end
 
+    ##
+    # Returns the last Frame object.
     def last
       self.slice(self.size - 1)
     end
 
+    ##
+    # Appends the given Frame into the tail of self.
     def push frame
       raise TypeError unless frame.kind_of? Frame
       # data
@@ -249,8 +286,12 @@ module AviGlitch
       self
     end
 
+    ##
+    # Alias for push
     alias :<< :push
 
+    ##
+    # Insert the given Frame objects into the given index.
     def insert n, *args
       new_frames = self.slice(0, n)
       args.each do |f|
@@ -263,10 +304,14 @@ module AviGlitch
       self
     end
 
+    ##
+    # Deletes one Frame at the given index.
     def delete_at n
       self.slice! n
     end
 
+    ##
+    # Returns true if +other+'s frames are same as self's frames.
     def == other
       @meta == other.meta
     end

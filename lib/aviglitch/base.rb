@@ -16,7 +16,7 @@ module AviGlitch
     attr_reader :file
 
     ##
-    # Create a new instance of AviGlitch::Base, open the file and 
+    # Creates a new instance of AviGlitch::Base, open the file and 
     # make it ready to manipulate.
     # It requires +path+ as Pathname.
     def initialize path
@@ -41,7 +41,7 @@ module AviGlitch
     end
 
     ##
-    # Output the glitched file to +path+, and close the file.
+    # Outputs the glitched file to +path+, and close the file.
     def output path
       FileUtils.cp @file.path, path
       close
@@ -54,7 +54,7 @@ module AviGlitch
     end
 
     ##
-    # Glitch each frame data.
+    # Glitches each frame data.
     # It is a convent method to iterate each frame.
     #
     # The argument +target+ takes symbols listed below:
@@ -93,7 +93,7 @@ module AviGlitch
     alias :write :output
 
     ##
-    # Swap the frames with other Frames data.
+    # Swaps the frames with other Frames data.
     def frames= other
       raise TypeError unless other.kind_of?(Frames)
       @frames.clear
@@ -137,7 +137,7 @@ module AviGlitch
 
     class << self
       ##
-      # Check if the +file+ is a correctly formetted AVI file.
+      # Checks if the +file+ is a correctly formetted AVI file.
       # +file+ can be String or Pathname or IO.
       def surely_formatted? file, debug = false
         answer = true

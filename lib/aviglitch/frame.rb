@@ -13,7 +13,7 @@ module AviGlitch
     attr_reader :id, :flag
 
     ##
-    # Create a new AviGlitch::Frame object.
+    # Creates a new AviGlitch::Frame object.
     #
     # The arguments are:
     # [+data+] just data, without meta-data
