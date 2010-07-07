@@ -44,7 +44,9 @@ describe AviGlitch, 'datamosh cli' do
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
     system [@cmd, @in, @in, @in].join(' ')
+    a = AviGlitch.open @in
     o = AviGlitch.open @out
+    o.frames.size.should == a.frames.size * 3
     o.frames.each_with_index do |f, i|
       if f.is_keyframe? && i == 0
         f.data.should_not match /^\000+$/

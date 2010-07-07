@@ -37,7 +37,7 @@ a.glitch_with_index :keyframe do |frame, i|
   (!all && i == 0) ? frame : "\000" * frame.size # keep the first frame
 end
 input.each do |file|
-  b = AviGlitch.open input.shift
+  b = AviGlitch.open file
   b.glitch :keyframe do |frame|
     "\000" * frame.size
   end
