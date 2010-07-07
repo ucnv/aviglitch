@@ -8,8 +8,6 @@ module AviGlitch
   # To glitch, and save file. The instance returned through AviGlitch#open.
   #
   class Base
-    SAFE_FRAMES_COUNT = 150000 # :nodoc:
-
     # AviGlitch::Frames object generated from the +file+.
     attr_reader :frames
     # The input file (copied tempfile).
@@ -31,10 +29,6 @@ module AviGlitch
 
       unless AviGlitch::Base.surely_formatted? @file
         raise 'Unsupported file passed.'
-      end
-      unless safe_frames_count? @file
-        close
-        exit
       end
       @frames = Frames.new @file
       # I believe Ruby's GC to close and remove the Tempfile..
@@ -109,31 +103,7 @@ module AviGlitch
       end
     end
 
-    def safe_frames_count? io # :nodoc:
-      r = true
-      io.pos = 12
-      while io.read(4) != 'idx1' do
-        s = io.read(4).unpack('V').first
-        io.pos += s
-      end
-      s = io.read(4).unpack('V').first
-      fc = s / 16
-      if fc >= SAFE_FRAMES_COUNT
-        trap(:INT) do
-          close
-          exit
-        end
-        m = ["WARNING: The passed file has too many frames (#{fc}).\n",
-          "It may use a large memory to process. ",
-          "We recommend to chop the movie to smaller chunks before you glitch.\n",
-          "Do you want to continue anyway? [yN] "].join('')
-        a = Readline.readline m
-        r = a == 'y'
-      end
-      r
-    end
-
-    private :valid_target?, :safe_frames_count?
+    private :valid_target?
 
     class << self
       ##

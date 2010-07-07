@@ -20,6 +20,9 @@ module AviGlitch
   class Frames
     include Enumerable
 
+    SAFE_FRAMES_COUNT = 150000              # :nodoc:
+    @@warn_if_frames_are_too_large = true   # :nodoc:
+
     attr_reader :meta
 
     ##
@@ -44,6 +47,10 @@ module AviGlitch
           :size   => io.read(4).unpack('V').first,
         }
       end
+      unless safe_frames_count? @meta.size
+        @io.close!
+        exit
+      end
       io.rewind
       @io = io
     end
@@ -54,7 +61,7 @@ module AviGlitch
       temp = Tempfile.new 'frames'
       frames_data_as_io(temp, Proc.new)
       overwrite temp
-      temp.close true
+      temp.close!
     end
 
     ##
@@ -86,6 +93,10 @@ module AviGlitch
     end
 
     def overwrite data  #:nodoc:
+      unless safe_frames_count? @meta.size
+        @io.close!
+        exit
+      end
       # Overwrite the file
       data.seek 0, IO::SEEK_END
       @io.pos = @pos_of_movi - 4  # 4 for size
@@ -143,7 +154,7 @@ module AviGlitch
       while d = other_data.read(1024) do
         this_data.print d
       end
-      other_data.close true
+      other_data.close!
       # meta
       other_meta = other_frames.meta.collect do |m|
         x = m.dup
@@ -153,7 +164,7 @@ module AviGlitch
       @meta.concat other_meta
       # close
       overwrite this_data
-      this_data.close true
+      this_data.close!
     end
 
     ##
@@ -282,7 +293,7 @@ module AviGlitch
       }
       # close
       overwrite this_data
-      this_data.close true
+      this_data.close!
       self
     end
 
@@ -332,6 +343,24 @@ module AviGlitch
       end
       b = b >= 0 ? b : @meta.size + b
       [b, l]
+    end
+
+    def safe_frames_count? count # :nodoc:
+      r = true
+      if @@warn_if_frames_are_too_large && count >= SAFE_FRAMES_COUNT
+        trap(:INT) do
+          @io.close!
+          exit
+        end
+        m = ["WARNING: The avi data has too many frames (#{count}).\n",
+          "It may use a large memory to process. ",
+          "We recommend to chop the movie to smaller chunks before you glitch.\n",
+          "Do you want to continue anyway? [yN] "].join('')
+        a = Readline.readline m
+        r = a == 'y'
+        @@warn_if_frames_are_too_large = !r
+      end
+      r
     end
 
     protected :frames_data_as_io, :meta
