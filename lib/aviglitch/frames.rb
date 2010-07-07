@@ -228,7 +228,8 @@ module AviGlitch
     ##
     # Removes frame(s) at the given index or the range (same as []).
     # Inserts the given Frame or Frames's contents into the removed index.
-    def []= *args, value
+    def []= *args
+      value = args.pop
       b, l = get_beginning_and_length *args
       ll = l.nil? ? 1 : l
       head = self.slice(0, b)

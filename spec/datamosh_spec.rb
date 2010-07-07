@@ -6,10 +6,10 @@ describe AviGlitch, 'datamosh cli' do
     FileUtils.mkdir OUTPUT_DIR unless File.exist? OUTPUT_DIR
     @in = FILES_DIR + 'sample.avi'
     @out = OUTPUT_DIR + 'out.avi'
-    datamosh = Pathname.new(
-      File.join(File.dirname(__FILE__), '..', 'bin/datamosh')
-    ).realpath
-    @cmd = "ruby %s -o %s " % [datamosh, @out]
+    here = File.dirname(__FILE__)
+    lib = Pathname.new(File.join(here, '..', 'lib')).realpath
+    datamosh = Pathname.new(File.join(here, '..', 'bin/datamosh')).realpath
+    @cmd = "ruby -I%s %s -o %s " % [lib, datamosh, @out]
   end
 
   after :each do
