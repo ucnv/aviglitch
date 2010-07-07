@@ -32,22 +32,17 @@ if input.empty?
   exit 1
 end
 
-ag = nil
+a = AviGlitch.open input.shift
+a.glitch_with_index :keyframe do |frame, i|
+  (!all && i == 0) ? frame : "\000" * frame.size # keep the first frame
+end
 input.each do |file|
-  a = AviGlitch.open file
-  a.glitch_with_index :keyframe do |frame, i|
-    if !all && ag.nil? && i == 0  # keep the first frame
-      frame
-    else
-      "\000" * frame.size
-    end
+  b = AviGlitch.open input.shift
+  b.glitch :keyframe do |frame|
+    "\000" * frame.size
   end
-  if ag.nil?
-    ag = a
-  else
-    ag.frames.concat a.frames
-  end
+  a.frames.concat b.frames
 end
 
-ag.output(output)
+a.output output
 
