@@ -1,3 +1,7 @@
+== 0.1.0 / 2010-07-07
+
+* Minor version up.
+
 == 0.0.3 / 2010-07-07
 
 * Changed AviGlitch::Frames allowing to slice and concatenate frames
