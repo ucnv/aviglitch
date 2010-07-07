@@ -1,3 +1,9 @@
+== 0.0.3 / 2010-07-07
+
+* Changed AviGlitch::Frames allowing to slice and concatenate frames
+(like Array).
+* Changed datamosh cli to accept multiple files.
+
 == 0.0.2 / 2010-05-17
 
 * Removed AviGlitch#new. Use AviGlitch#open instead of #new.

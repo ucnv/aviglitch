@@ -1,8 +1,3 @@
-require 'tempfile'
-require 'fileutils'
-require 'readline'
-require 'pathname'
-
 module AviGlitch
   # Base is the object that provides interfaces mainly used.
   # To glitch, and save file. The instance returned through AviGlitch#open.

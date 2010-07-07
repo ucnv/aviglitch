@@ -1,5 +1,3 @@
-require 'stringio'
-
 module AviGlitch
 
   # Frames provides the interface to access each frame
