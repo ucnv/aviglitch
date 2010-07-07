@@ -210,7 +210,7 @@ module AviGlitch
 
     ##
     # Alias for slice
-    alias :[] :slice
+    alias_method :[], :slice
 
     ##
     # Removes frame(s) at the given index or the range (same as slice).
@@ -299,7 +299,7 @@ module AviGlitch
 
     ##
     # Alias for push
-    alias :<< :push
+    alias_method :<<, :push
 
     ##
     # Insert the given Frame objects into the given index.

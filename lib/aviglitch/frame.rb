@@ -35,7 +35,7 @@ module AviGlitch
 
     ##
     # Alias for is_keyframe?
-    alias :is_iframe? :is_keyframe?
+    alias_method :is_iframe?, :is_keyframe?
 
     ##
     # Returns if it is a video frame and also not a key frame.
@@ -45,7 +45,7 @@ module AviGlitch
 
     ##
     # Alias for is_deltaframe?
-    alias :is_pframe? :is_deltaframe?
+    alias_method :is_pframe?, :is_deltaframe?
 
     ##
     # Returns if it is a video frame.

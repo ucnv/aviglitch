@@ -84,7 +84,7 @@ module AviGlitch
       self
     end
 
-    alias :write :output
+    alias_method :write, :output
 
     ##
     # Swaps the frames with other Frames data.
