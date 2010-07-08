@@ -21,39 +21,32 @@ describe AviGlitch, 'datamosh cli' do
   end
 
   it 'should correctly process files' do
+    a = AviGlitch.open @in
+    keys = a.frames.inject(0) do |c, f|
+      c += 1 if f.is_keyframe?
+      c
+    end
+    total = a.frames.size
+    a.close
+
     system [@cmd, @in].join(' ')
     o = AviGlitch.open @out
-    o.frames.each_with_index do |f, i|
-      if f.is_keyframe? && i == 0
-        f.data.should_not match /^\000+$/
-      elsif f.is_keyframe?
-        f.data.should match /^\000+$/
-      end
-    end
+    o.frames.size.should == total - keys + 1
+    o.frames.first.is_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
     system [@cmd, '-a', @in].join(' ')
     o = AviGlitch.open @out
-    o.frames.each do |f|
-      if f.is_keyframe?
-        f.data.should match /^\000+$/
-      end
-    end
+    o.frames.size.should == total - keys
+    o.frames.first.is_keyframe?.should be false
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
     system [@cmd, @in, @in, @in].join(' ')
-    a = AviGlitch.open @in
     o = AviGlitch.open @out
-    o.frames.size.should == a.frames.size * 3
-    o.frames.each_with_index do |f, i|
-      if f.is_keyframe? && i == 0
-        f.data.should_not match /^\000+$/
-      elsif f.is_keyframe?
-        f.data.should match /^\000+$/
-      end
-    end
+    o.frames.size.should == 1 + (total - keys) * 3
+    o.frames.first.is_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
