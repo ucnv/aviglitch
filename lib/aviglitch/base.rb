@@ -13,7 +13,7 @@ module AviGlitch
     # make it ready to manipulate.
     # It requires +path+ as Pathname.
     def initialize path
-      File.open(path) do |f|
+      File.open(path, 'rb') do |f|
         # copy as tempfile
         @file = Tempfile.open 'aviglitch'
         f.rewind
@@ -107,7 +107,7 @@ module AviGlitch
       def surely_formatted? file, debug = false
         answer = true
         is_io = file.respond_to?(:seek)  # Probably IO.
-        file = File.open(file) unless is_io
+        file = File.open(file, 'rb') unless is_io
         begin
           file.seek 0, IO::SEEK_END
           eof = file.pos

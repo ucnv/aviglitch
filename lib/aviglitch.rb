@@ -6,6 +6,7 @@ require 'stringio'
 require 'aviglitch/base'
 require 'aviglitch/frame'
 require 'aviglitch/frames'
+require 'aviglitch/tempfile'
 
 # AviGlitch provides the ways to glitch AVI formatted video files.
 #

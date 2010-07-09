@@ -68,7 +68,7 @@ module AviGlitch
       @meta.size
     end
 
-    def frames_data_as_io(io = nil, block = nil) #:nodoc:
+    def frames_data_as_io io = nil, block = nil  #:nodoc:
       io = Tempfile.new('tmep') if io.nil?
       @meta = @meta.select do |m|
         @io.pos = @pos_of_movi + m[:offset] + 8   # 8 for id and size
