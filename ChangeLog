@@ -1,6 +1,8 @@
-== 0.1.0 / 2010-07-07
+== 0.1.0 / 2010-07-09
 
 * Minor version up.
+* Fixed bugs with Ruby 1.8.7.
+* Fixed the synchronization problem with datamosh cli.
 
 == 0.0.3 / 2010-07-07
 

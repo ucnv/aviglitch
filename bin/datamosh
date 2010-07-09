@@ -10,7 +10,7 @@ all = false
 
 opts = OptionParser.new do |opts|
   opts.banner = "datamosh - AviGlitch's datamoshing video generator."
-  opts.define_head "Usage: #{File.basename($0)} <input> [options]"
+  opts.define_head "Usage: #{File.basename($0)} [options] file [file2 ...]"
   opts.separator "Options:"
   opts.on("-o", "--output [OUTPUT]", 
     "Output the video to OUTPUT (./out.avi by default)") do |f|

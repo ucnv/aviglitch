@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ucnv"]
-  s.date = %q{2010-07-07}
+  s.date = %q{2010-07-09}
   s.default_executable = %q{datamosh}
   s.email = %q{ucnvvv@gmail.com}
   s.executables = ["datamosh"]
