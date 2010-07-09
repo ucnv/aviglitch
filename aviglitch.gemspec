@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
      "lib/aviglitch/base.rb",
      "lib/aviglitch/frame.rb",
      "lib/aviglitch/frames.rb",
+     "lib/aviglitch/tempfile.rb",
      "spec/aviglitch_spec.rb",
      "spec/datamosh_spec.rb",
      "spec/files/sample.avi",
