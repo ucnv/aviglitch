@@ -1,8 +1,10 @@
 module AviGlitch
+
   # Base is the object that provides interfaces mainly used.
   # To glitch, and save file. The instance returned through AviGlitch#open.
   #
   class Base
+
     # AviGlitch::Frames object generated from the +file+.
     attr_reader :frames
     # The input file (copied tempfile).
@@ -44,7 +46,7 @@ module AviGlitch
 
     ##
     # Glitches each frame data.
-    # It is a convent method to iterate each frame.
+    # It is a convenient method to iterate each frame.
     #
     # The argument +target+ takes symbols listed below:
     # [<tt>:keyframe</tt> or <tt>:iframe</tt>]   select video key frames (aka I-frame)
