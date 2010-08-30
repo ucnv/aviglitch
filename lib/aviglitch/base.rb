@@ -1,7 +1,7 @@
 module AviGlitch
 
   # Base is the object that provides interfaces mainly used.
-  # To glitch, and save file. The instance returned through AviGlitch#open.
+  # To glitch, and save file. The instance is returned through AviGlitch#open.
   #
   class Base
 

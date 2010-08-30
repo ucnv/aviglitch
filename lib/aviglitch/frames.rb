@@ -8,7 +8,7 @@ module AviGlitch
   #   avi = AviGlitch.new '/path/to/your.avi'
   #   frames = avi.frames
   #   frames.each do |frame|
-  #     ## frame is a reference of a AviGlitch::Frame object
+  #     ## frame is a reference of an AviGlitch::Frame object
   #     frame.data = frame.data.gsub(/\d/, '0')
   #   end
   #
@@ -301,7 +301,7 @@ module AviGlitch
     alias_method :<<, :push
 
     ##
-    # Insert the given Frame objects into the given index.
+    # Inserts the given Frame objects into the given index.
     def insert n, *args
       new_frames = self.slice(0, n)
       args.each do |f|
@@ -327,7 +327,7 @@ module AviGlitch
     end
 
     ##
-    # Generate new AviGlitch::Base instance using self.
+    # Generates new AviGlitch::Base instance using self.
     def to_avi
       AviGlitch.open @io.path
     end
