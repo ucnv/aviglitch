@@ -3,47 +3,129 @@
 <head>
   <meta charset="utf-8" />
   <title>AviGlitch - A Ruby library to destroy your AVI files.</title>
-  <style type="text/css">
-  body {
-    font-size: xx-large;
-    line-height: 1.3;
-  }
-  h1, h2 {
-    margin: 0;
-  }
-  h1 a {
-    color: #000;
-    text-decoration: none;
-  }
-  .description {
-    margin: 5px 4px 20px 4px;
-    font-size: smaller;
-    line-height: 1;
-  }
-  #container {
-    width: 770px;
-    margin: 0 auto;
-  }
-  </style>
+  <link rel="stylesheet" type="text/css" href="files/style.css" />
+  <script type="text/javascript" src="files/prettify.js"></script>
+  <script type="text/javascript" src="files/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="files/fancybox/jquery.mousewheel-3.0.2.pack.js"></script>
+  <script type="text/javascript" src="files/fancybox/jquery.fancybox-1.3.1.js"></script>
+  <link rel="stylesheet" type="text/css" href="files/fancybox/jquery.fancybox-1.3.1.css" media="screen" />
+  <script type="text/javascript">
+  $(document).ready(function() {
+    var c = {
+      width        : 640,
+      titleShow    : false,
+      padding      : 0,
+      margin       : 0,
+      autoScale    : false,
+      transitionIn : 'fade',
+      transitionOut: 'fade',
+      type         : 'iframe'
+    };
+    c.height = 368;
+    $('.e1').fancybox(c);
+    c.height = 360;
+    $('.e2').fancybox(c);
+    c.height = 352;
+    $('.e3').fancybox(c);
+    c.height = 400;
+    $('.e4').fancybox(c);
+
+    prettyPrint();
+  });
+  </script>
 </head>
-
 <body>
-  <a href="http://github.com/ucnv/aviglitch"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
+  <a href="http://github.com/ucnv/aviglitch"><img style="position: absolute; top: 0; right: 0; border: 0;" src="files/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
   <div id="container">
-    <h1><a href="http://github.com/ucnv/aviglitch">AviGlitch</a></h1>
-    <h2 class="description">A Ruby library to destroy your AVI files.</h2>
-    <iframe src="http://player.vimeo.com/video/14274415?color=FF7700" width="768" height="480" frameborder="0"></iframe>
-    <h2>Install</h2>
+    <h1><a href="http://ucnv.github.com/aviglitch/">AviGlitch</a></h1>
+    <div class="description">A Ruby library to destroy your AVI files.</div>
+    
+    <h2><a name="installation">Installation</a></h2>
+    <p>Install Ruby if you have not. And install AviGlitch through rubygems.
     <pre><code>gem install aviglitch</code></pre>
-    <h2>Author</h2>
-    <p>ucnv (ucnvvv at gmail dot com) </p>
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/ucnv/aviglitch">ucnv/aviglitch</a>
+    </p>
 
-    </div>
+
+    <h2><a name="codes_and_examples">Codes and Examples</a></h2>
+
+    <p>We'll show some code examples here. Before that, there is something you need to know.</p>
+    <p>The input file must be an AVI formatted file. AviGlitch doesn't provide any file converting function, use ffmpeg or something to make an input sample.</p>
+    <p>We recommend making the input file in small size (5 mins or shorter) for saving your machine power and executing time.</p>
+  <p>If you use Ruby 1.8.x, you must <code>require 'rubygems'</code> on the top of code lines.</p>
+    <p>And what we do is basically an illigal operation for the file and the player application, try codes at your own risk.</p>
+    
+    <h3 class="example"><a name="datamoshing" class="e1" href="http://player.vimeo.com/video/5609362?portrait=0&color=ffffff"><img src="files/e1.jpg" alt="Datamoshing of the Dead" /></a></h3>
+    <p>At first, let's do a simple glitch that is known as datamoshing. Datamoshing means key frames removed video. You can see in the code below that AviGlitch provides an easy way to remove key frames.</p>
+    <pre class="prettyprint"><code>require 'aviglitch'
+  
+a = AviGitch.open 'file.avi'  # Rewrite this line for your file.
+a.glitch :keyframe do |f|     # To touch key frames, pass the symbol :keyframe.
+  nil                         # Returning nil in glitch method's yield block
+end                           # offers to remove the frame.
+a.output 'out.avi' </code></pre>
+    <p>This code will generate a video like <a class="e1" href="http://player.vimeo.com/video/5609362?portrait=0&color=ffffff">this</a>.</p>
+
+    <p>AviGlitch includes a command line tool named <code>datamosh</code>, The <code>datamosh</code> command does same thing as the code above. Without any coding, in the terminal, simply type;
+    <pre><code>datamosh file.avi</code></pre>
+    </p>
+
+    <p>This is the world's easiest way to make a datamoshing video. If you like a complex and messy way, learn <a href="http://www.youtube.com/watch?v=tYytVzbPky8" alt="How to datamosh">this</a>.</p>
+
+    <h3 class="example"><a name="color_crsshing" class="e2" href="http://player.vimeo.com/video/13152779?portrait=0&color=ffffff"><img src="files/e2.jpg" alt="Crshed Universal" /></a></h3>
+    <p>Next is an example of a frame manipulation. It's bit complicated. Following code makes a cirtain frame repeated a number of times.</p>
+    <pre class="prettyprint"><code>require 'aviglitch'
+  
+a = AviGlitch.open 'file.avi'       # Rewrite this line for your file.
+d = []
+a.frames.each_with_index do |f, i|
+  d.push(i) if f.is_deltaframe?     # Collecting non-keyframes indices.
+end
+q = a.frames[0, 5]                  # Keep first key frame.
+100.times do
+  x = a.frames[d[rand(d.size)], 1]  # Select a cirtain non-keyframe.
+  q.concat(x * rand(50))            # Repeat the frame n times and concatinate with q.
+end
+o = AviGlitch.open q                # New AviGlitch instance using the frames.
+o.output 'out.avi'</code></pre>
+
+    <p>It makes a beautiful glitch like <a class="e2" href="http://player.vimeo.com/video/13152779?portrait=0&color=ffffff">this</a>.</p>
+
+    <h3 class="example"><a name="vlc_bending" class="e3" href="http://player.vimeo.com/video/6547197?portrait=0&color=ffffff"><img src="files/e3.jpg" alt="VLC Bending" /></a></h3>
+    <p>Next example uses a pretty neat trick. Following code rewrites key frames' screen size data randomly.</a>
+    <pre class="prettyprint"><code>require 'aviglitch'
+  
+a = AviGlitch.new 'file.avi'
+a.glitch_with_index(:keyframe) do |data, i|
+  x = data[25..28].unpack('B*').first
+  w = rand(('0b' + x[0..12]).oct * 1.5)
+  h = rand(('0b' + x[14..26]).oct * 1.5)
+  x[0..12] = "%013b" % ((w &gt; 50) ? w : 50)
+  x[14..26] = "%013b" % ((h &gt; 50) ? h : 50)
+  (i == 0) ? data : data[0..24] + [x].pack('B*') + data[29..data.size]
+end
+a.output 'out.avi'</code></pre>
+
+    <p>And to play the result output with the VLC player, it becomes like <a class="e3" href="http://player.vimeo.com/video/6547197?portrait=0&color=ffffff">this</a>.</p>
+    <p>It's completely depends on the VLC player application and the Xvid codec. It doesn't work with other player and codec combinations.</p>
+
+    <h3 class="example"><a name="excess_glitch" class="e4" href="http://player.vimeo.com/video/14274415?portrait=0&color=ffffff"><img src="files/e4.jpg" alt="Utah Kawasaki Band Aratame Ucnv Band on June 28, 2010" /></a></h3>
+    <p>At last, we will show <a class="e4" href="http://player.vimeo.com/video/14274415?portrait=0&color=ffffff">the achievement</a> of excess glitches using ffmpeg, mencoder and AviGlitch (and no Adobe stuff).</p>
+    <hr />
+    <p>For more details, read <a href="http://rdoc.info/gems/aviglitch/frames" alt="Documentation">the documentation</a>.</p>
+
+
+    <h2><a name="resources">Resources</a></h2>
+    <ul>
+      <li>Source code: <a href="http://github.com/ucnv/aviglitch" alt="Source code">http://github.com/ucnv/aviglitch</a></li>
+      <li>Documentation: <a href="http://rdoc.info/gems/aviglitch/frames" alt="Documentation">http://rdoc.info/gems/aviglitch/frames</a></li>
+      <li>Author: ucnv (ucnvvv at gmail dot com)</li>
+    </ul>
+
 
   </div>
 
   
 </body>
 </html>
+
+
