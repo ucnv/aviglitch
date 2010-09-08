@@ -24,7 +24,6 @@ a img {
 
 pre {
   font-size: smaller;
- /* background: #00102f;*/
   background: #000;
   color: #fff;
   padding: 15px;
@@ -54,7 +53,7 @@ h1 a {
   display: block;
   padding: 0 5px;
   letter-spacing: -1px;
-  font-size: 110px;
+  font-size: 55px;
   text-decoration: none;
   color: #000;
 }
@@ -75,9 +74,9 @@ h3.example a {
 
 .description {
   text-shadow: 1px 1px 1px #bbb;
-  margin: -20px 4px 20px 10px;
-  font-weight: bold;
-  font-size: x-large;
+  margin: -10px 4px 20px 7px;
+  font-weight: normal;
+  font-size: small;
   line-height: 1;
 }
 
