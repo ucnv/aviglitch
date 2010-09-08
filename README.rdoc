@@ -1,6 +1,6 @@
 = AviGlitch
 
-* http://github.com/ucnv/aviglitch
+* http://ucnv.github.com/aviglitch/
 
 == Description
 

@@ -18,8 +18,8 @@ module AviGlitch
   class Frames
     include Enumerable
 
-    SAFE_FRAMES_COUNT = 150000              # :nodoc:
-    @@warn_if_frames_are_too_large = true   # :nodoc:
+    SAFE_FRAMES_COUNT = 150000              #:nodoc:
+    @@warn_if_frames_are_too_large = true   #:nodoc:
 
     attr_reader :meta
 
@@ -344,7 +344,7 @@ module AviGlitch
       [b, l]
     end
 
-    def safe_frames_count? count # :nodoc:
+    def safe_frames_count? count #:nodoc:
       r = true
       if @@warn_if_frames_are_too_large && count >= SAFE_FRAMES_COUNT
         trap(:INT) do
