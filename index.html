@@ -72,7 +72,7 @@ a.output 'out.avi' </code></pre>
     <p>This is the world's easiest way to make a datamoshing video. If you like a complex and messy way, learn <a href="http://www.youtube.com/watch?v=tYytVzbPky8" alt="How to datamosh">this</a>.</p>
 
     <h3 class="example"><a name="color_crsshing" class="e2" href="http://player.vimeo.com/video/13152779?portrait=0&color=ffffff"><img src="files/e2.jpg" alt="Crshed Universal" /></a></h3>
-    <p>Next is an example of a frame manipulation. It's bit complicated. Following code makes a cirtain frame repeated a number of times.</p>
+    <p>Next is an example of the frames manipulation. It's bit complicated. Following code makes a certain frame repeated a number of times.</p>
     <pre class="prettyprint"><code>require 'aviglitch'
   
 a = AviGlitch.open 'file.avi'       # Rewrite this line for your file.
@@ -82,8 +82,8 @@ a.frames.each_with_index do |f, i|
 end
 q = a.frames[0, 5]                  # Keep first key frame.
 100.times do
-  x = a.frames[d[rand(d.size)], 1]  # Select a cirtain non-keyframe.
-  q.concat(x * rand(50))            # Repeat the frame n times and concatinate with q.
+  x = a.frames[d[rand(d.size)], 1]  # Select a certain non-keyframe.
+  q.concat(x * rand(50))            # Repeat the frame n times and concatenate with q.
 end
 o = AviGlitch.open q                # New AviGlitch instance using the frames.
 o.output 'out.avi'</code></pre>
@@ -91,10 +91,10 @@ o.output 'out.avi'</code></pre>
     <p>It makes a beautiful glitch like <a class="e2" href="http://player.vimeo.com/video/13152779?portrait=0&color=ffffff">this</a>.</p>
 
     <h3 class="example"><a name="vlc_bending" class="e3" href="http://player.vimeo.com/video/6547197?portrait=0&color=ffffff"><img src="files/e3.jpg" alt="VLC Bending" /></a></h3>
-    <p>Next example uses a pretty neat trick. Following code rewrites key frames' screen size data randomly.</a>
+    <p>Next example uses a pretty neat trick. Following code overwrites key frames' screen size data randomly.</a>
     <pre class="prettyprint"><code>require 'aviglitch'
   
-a = AviGlitch.new 'file.avi'
+a = AviGlitch.open 'file.avi'
 a.glitch_with_index(:keyframe) do |data, i|
   x = data[25..28].unpack('B*').first
   w = rand(('0b' + x[0..12]).oct * 1.5)
