@@ -46,13 +46,13 @@ hr {
 
 h1, h2, h3, h4, h5, .description {
   margin: 0;
+  letter-spacing: -1px;
 }
 
 h1 a {
   text-shadow: 1px 1px 4px #bbb;
   display: block;
   padding: 0 5px;
-  letter-spacing: -1px;
   font-size: 55px;
   text-decoration: none;
   color: #000;
@@ -76,7 +76,7 @@ h3.example a {
   text-shadow: 1px 1px 1px #bbb;
   margin: -10px 4px 20px 7px;
   font-weight: normal;
-  font-size: small;
+  font-size: smaller;
   line-height: 1;
 }
 
