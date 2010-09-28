@@ -58,7 +58,7 @@
     <p>At first, let's do a simple glitch that is known as datamoshing. Datamoshing means key frames removed video. You can see in the code below that AviGlitch provides an easy way to remove key frames.</p>
     <pre class="prettyprint"><code>require 'aviglitch'
   
-a = AviGitch.open 'file.avi'  # Rewrite this line for your file.
+a = AviGlitch.open 'file.avi' # Rewrite this line for your file.
 a.glitch :keyframe do |f|     # To touch key frames, pass the symbol :keyframe.
   nil                         # Returning nil in glitch method's yield block
 end                           # offers to remove the frame.
@@ -69,7 +69,7 @@ a.output 'out.avi' </code></pre>
     <pre><code>datamosh file.avi</code></pre>
     </p>
 
-    <p>This is the world's easiest way to make a datamoshing video. If you like a complex and messy way, learn <a href="http://www.youtube.com/watch?v=tYytVzbPky8" alt="How to datamosh">this</a>.</p>
+    <p>This is the world's easiest way to make a datamoshing video. If you like a complex and messy way, learn from <a href="http://www.youtube.com/watch?v=tYytVzbPky8" alt="How to datamosh">this guy</a>.</p>
 
     <h3 class="example"><a name="color_crsshing" class="e2" href="http://player.vimeo.com/video/13152779?portrait=0&color=ffffff"><img src="files/e2.jpg" alt="Crshed Universal" /></a></h3>
     <p>Next is an example of the frames manipulation. It's bit complicated. Following code makes a certain frame repeated a number of times.</p>
