@@ -7,7 +7,7 @@ begin
     gem.name = "aviglitch"
     gem.summary = "A Ruby library to destroy your AVI files."
     gem.email = "ucnvvv@gmail.com"
-    gem.homepage = "http://github.com/ucnv/aviglitch"
+    gem.homepage = "http://ucnv.github.com/aviglitch/"
     gem.authors = ["ucnv"]
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
     gem.files = %w(README.rdoc ChangeLog Rakefile VERSION) +

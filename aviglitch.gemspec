@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ucnv"]
-  s.date = %q{2010-09-09}
+  s.date = %q{2010-09-10}
   s.default_executable = %q{datamosh}
   s.email = %q{ucnvvv@gmail.com}
   s.executables = ["datamosh"]
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
      "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
-  s.homepage = %q{http://github.com/ucnv/aviglitch}
+  s.homepage = %q{http://ucnv.github.com/aviglitch/}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
