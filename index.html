@@ -33,6 +33,17 @@
     prettyPrint();
   });
   </script>
+  <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10549214-3']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+  </script>
 </head>
 <body>
   <a href="http://github.com/ucnv/aviglitch"><img style="position: absolute; top: 0; right: 0; border: 0;" src="files/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
@@ -42,7 +53,7 @@
     
     <h2><a name="installation">Installation</a></h2>
     <p>Install Ruby if you have not. And install AviGlitch through rubygems.
-    <pre><code>gem install aviglitch</code></pre>
+    <pre><code>$ sudo gem install aviglitch</code></pre>
     </p>
 
 
@@ -66,7 +77,7 @@ a.output 'out.avi' </code></pre>
     <p>This code will generate a video like <a class="e1" href="http://player.vimeo.com/video/5609362?portrait=0&color=ffffff">this</a>.</p>
 
     <p>The AviGlitch library includes a command line tool named <code>datamosh</code>, The <code>datamosh</code> command does same thing as the code above. Without any coding, in the terminal, simply type;
-    <pre><code>datamosh file.avi</code></pre>
+    <pre><code>$ datamosh file.avi</code></pre>
     </p>
 
     <p>This is the world's easiest way to make a datamoshing video. If you like a complex and messy way, learn from <a href="http://www.youtube.com/watch?v=tYytVzbPky8" alt="How to datamosh">this guy</a>.</p>
