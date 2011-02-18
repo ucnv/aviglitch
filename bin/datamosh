@@ -34,13 +34,16 @@ end
 
 a = AviGlitch.open input.shift
 a.glitch_with_index :keyframe do |frame, i|
-  (!all && i == 0) ? frame : nil # keep the first frame
+  (!all && i == 0) ? frame : "" # keep the first frame
 end
+a.frames.clear_keyframes!(!all ? 1..a.frames.size : nil)
+
 input.each do |file|
   b = AviGlitch.open file
   b.glitch :keyframe do |frame|
-    nil
+    ""
   end
+  b.frames.clear_keyframes!
   a.frames.concat b.frames
 end
 

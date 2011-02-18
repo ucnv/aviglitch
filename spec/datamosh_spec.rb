@@ -31,21 +31,21 @@ describe AviGlitch, 'datamosh cli' do
 
     system [@cmd, @in].join(' ')
     o = AviGlitch.open @out
-    o.frames.size.should == total - keys + 1
+    o.frames.size.should == total
     o.frames.first.is_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
     system [@cmd, '-a', @in].join(' ')
     o = AviGlitch.open @out
-    o.frames.size.should == total - keys
+    o.frames.size.should == total
     o.frames.first.is_keyframe?.should be false
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
     system [@cmd, @in, @in, @in].join(' ')
     o = AviGlitch.open @out
-    o.frames.size.should == 1 + (total - keys) * 3
+    o.frames.size.should == total * 3
     o.frames.first.is_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
