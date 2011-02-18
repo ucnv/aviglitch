@@ -78,6 +78,8 @@ module AviGlitch
         unless frame.data.nil?
           m[:offset] = io.pos + 4   # 4 for 'movi'
           m[:size] = frame.data.size
+          m[:flag] = frame.flag
+          m[:id] = frame.id
           io.print m[:id]
           io.print [frame.data.size].pack('V')
           io.print frame.data
@@ -318,6 +320,17 @@ module AviGlitch
     # Deletes one Frame at the given index.
     def delete_at n
       self.slice! n
+    end
+
+    ##
+    # Modify keyframes to deltaframes at given range, or all.
+    def clear_keyframes! range = nil
+      range = 0..self.size if range.nil?
+      self.each_with_index do |frame, i|
+        if range.include? i
+          frame.flag = 0 if frame.is_keyframe?
+        end
+      end
     end
 
     ##

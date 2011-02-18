@@ -446,5 +446,38 @@ describe AviGlitch::Frames do
     x.should be_nil
   end
 
+  it 'can modify frame flag and frame id' do
+    a = AviGlitch.open @in
+    a.frames.each do |f|
+      f.flag = 0
+      f.id = "02dc"
+    end
+    a.output @out
+    a = AviGlitch.open @out
+    a.frames.each do |f|
+      f.flag.should == 0
+      f.id.should == "02dc"
+    end
+  end
+
+  it 'should clear keyframes with one method' do
+    a = AviGlitch.open @in
+    a.frames.clear_keyframes!
+    a.output @out
+    a = AviGlitch.open @out
+    a.frames.each do |f|
+      f.is_keyframe?.should be false
+    end
+
+    a = AviGlitch.open @in
+    a.frames.clear_keyframes! 0..50
+    a.output @out
+    a = AviGlitch.open @out
+    a.frames.each_with_index do |f, i|
+      if i <= 50
+        f.is_keyframe?.should be false
+      end
+    end
+  end
 
 end

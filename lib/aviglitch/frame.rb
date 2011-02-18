@@ -9,8 +9,7 @@ module AviGlitch
     AVIIF_KEYFRAME = 0x00000010
     AVIIF_NO_TIME  = 0x00000100
 
-    attr_accessor :data
-    attr_reader :id, :flag
+    attr_accessor :data, :id, :flag
 
     ##
     # Creates a new AviGlitch::Frame object.
