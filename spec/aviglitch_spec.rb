@@ -143,4 +143,24 @@ describe AviGlitch do
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
+  it 'should clear keyframes with one method' do
+    a = AviGlitch.open @in
+    a.clear_keyframes!
+    a.output @out
+    a = AviGlitch.open @out
+    a.frames.each do |f|
+      f.is_keyframe?.should be false
+    end
+
+    a = AviGlitch.open @in
+    a.clear_keyframes! 0..50
+    a.output @out
+    a = AviGlitch.open @out
+    a.frames.each_with_index do |f, i|
+      if i <= 50
+        f.is_keyframe?.should be false
+      end
+    end
+  end
+
 end

@@ -33,9 +33,10 @@ module AviGlitch
 
     ##
     # Outputs the glitched file to +path+, and close the file.
-    def output path
+    def output path, do_file_close = true
       FileUtils.cp @file.path, path
-      close
+      close if do_file_close
+      self
     end
 
     ##
@@ -81,7 +82,13 @@ module AviGlitch
       self
     end
 
-    alias_method :write, :output
+    ##
+    # Clears all (or in +range+) keyframes to deltaframes.
+    # It's an alias for Frames#clear_keyframes!
+    def clear_keyframes! range = nil
+      self.frames.clear_keyframes! range
+      self
+    end
 
     ##
     # Swaps the frames with other Frames data.
@@ -90,6 +97,8 @@ module AviGlitch
       @frames.clear
       @frames.concat other
     end
+
+    alias_method :write, :output
 
     def valid_target? target, frame #:nodoc:
       return true if target == :all
