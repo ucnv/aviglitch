@@ -345,6 +345,10 @@ module AviGlitch
       AviGlitch.open @io.path
     end
 
+    def inspect # :nodec:
+      "#<#{self.class.name}:#{sprintf("0x%x", object_id)} @io=#{@io.inspect} size=#{self.size}>"
+    end
+
     def get_beginning_and_length *args #:nodoc:
       b, l = args
       if args.first.kind_of? Range
