@@ -1,3 +1,10 @@
+== 0.1.2 / 2011-04-10
+
+* Fix to be able to handle data with offsets from 0 of the file.
+* Added clear_keyframes! method to AviGlitch::Frames and AviGlitch::Base.
+* Changed to be able to access frame's meta data.
+* Changed datamosh command to handle wildcard char.
+
 == 0.1.1 / 2010-09-09
 
 * Fixed a bug with windows.
