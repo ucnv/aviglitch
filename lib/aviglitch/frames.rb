@@ -45,8 +45,9 @@ module AviGlitch
           :size   => io.read(4).unpack('V').first,
         }
       end
+      fix_offsets_if_needed io
       unless safe_frames_count? @meta.size
-        @io.close!
+        io.close!
         exit
       end
       io.rewind
@@ -379,7 +380,21 @@ module AviGlitch
       r
     end
 
+    def fix_offsets_if_needed io #:nodoc:
+      # rarely data offsets begin from 0 of the file
+      return if @meta.empty?
+      pos = io.pos
+      m = @meta.first
+      io.pos = @pos_of_movi + m[:offset]
+      unless io.read(4) == m[:id]
+        @meta.each do |x|
+          x[:offset] -= @pos_of_movi
+        end
+      end
+      io.pos = pos
+    end
+
     protected :frames_data_as_io, :meta
-    private :overwrite, :get_beginning_and_length
+    private :overwrite, :get_beginning_and_length, :fix_offsets_if_needed
   end
 end
