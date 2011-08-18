@@ -33,6 +33,7 @@ describe AviGlitch, 'datamosh cli' do
     o = AviGlitch.open @out
     o.frames.size.should == total
     o.frames.first.is_keyframe?.should be true
+    o.has_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
@@ -40,6 +41,7 @@ describe AviGlitch, 'datamosh cli' do
     o = AviGlitch.open @out
     o.frames.size.should == total
     o.frames.first.is_keyframe?.should be false
+    o.has_keyframe?.should be false
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 
@@ -49,6 +51,11 @@ describe AviGlitch, 'datamosh cli' do
     o.frames.first.is_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
-  end
 
+    system [@cmd, '--fake', @in].join(' ')
+    o = AviGlitch.open @out
+    o.has_keyframe?.should be false
+    o.close
+
+  end
 end

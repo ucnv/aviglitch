@@ -163,4 +163,13 @@ describe AviGlitch do
     end
   end
 
+  it 'should check if keyframes exist.' do
+    a = AviGlitch.open @in
+    a.has_keyframe?.should be true
+    a.glitch :keyframe do |f|
+      nil
+    end
+    a.has_keyframe?.should be false
+  end
+
 end
