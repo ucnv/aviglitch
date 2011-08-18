@@ -91,6 +91,19 @@ module AviGlitch
     end
 
     ##
+    # Check if it has keyframes.
+    def has_keyframe?
+      result = false
+      self.frames.each do |f|
+        if f.is_keyframe?
+          result = true
+          break
+        end
+      end
+      result
+    end
+
+    ##
     # Swaps the frames with other Frames data.
     def frames= other
       raise TypeError unless other.kind_of?(Frames)
@@ -99,6 +112,7 @@ module AviGlitch
     end
 
     alias_method :write, :output
+    alias_method :has_keyframes?, :has_keyframe?
 
     def valid_target? target, frame #:nodoc:
       return true if target == :all
