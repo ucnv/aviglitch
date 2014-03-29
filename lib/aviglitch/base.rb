@@ -83,10 +83,10 @@ module AviGlitch
     end
 
     ##
-    # Clears all (or in +range+) keyframes to deltaframes.
-    # It's an alias for Frames#clear_keyframes!
-    def clear_keyframes! range = nil
-      self.frames.clear_keyframes! range
+    # Mutates all (or in +range+) keyframes into deltaframes.
+    # It's an alias for Frames#mutate_keyframes_into_deltaframes!
+    def mutate_keyframes_into_deltaframes! range = nil
+      self.frames.mutate_keyframes_into_deltaframes! range
       self
     end
 
@@ -101,6 +101,15 @@ module AviGlitch
         end
       end
       result
+    end
+
+    ##
+    # Removes all keyframes.
+    # It is same as +glitch(:keyframes){|f| nil }+
+    def remove_all_keyframes!
+      self.glitch :keyframe do |f|
+        nil
+      end
     end
 
     ##

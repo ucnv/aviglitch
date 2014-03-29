@@ -46,7 +46,7 @@ unless fake
     (!all && i == 0) ? frame : "" # keep the first frame
   end
 end
-a.clear_keyframes!(!all && !fake ? 1..a.frames.size : nil)
+a.mutate_keyframes_into_deltaframes!(!all && !fake ? 1..a.frames.size : nil)
 
 input.each do |file|
   b = AviGlitch.open file
@@ -55,7 +55,7 @@ input.each do |file|
       ""
     end
   end
-  b.clear_keyframes!
+  b.mutate_keyframes_into_deltaframes!
   a.frames.concat b.frames
 end
 

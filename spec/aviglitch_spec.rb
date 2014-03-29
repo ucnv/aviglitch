@@ -143,9 +143,9 @@ describe AviGlitch do
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
-  it 'should clear keyframes with one method' do
+  it 'should mutate keyframes into deltaframes with one method' do
     a = AviGlitch.open @in
-    a.clear_keyframes!
+    a.mutate_keyframes_into_deltaframes!
     a.output @out
     a = AviGlitch.open @out
     a.frames.each do |f|
@@ -153,7 +153,7 @@ describe AviGlitch do
     end
 
     a = AviGlitch.open @in
-    a.clear_keyframes! 0..50
+    a.mutate_keyframes_into_deltaframes! 0..50
     a.output @out
     a = AviGlitch.open @out
     a.frames.each_with_index do |f, i|
@@ -170,6 +170,14 @@ describe AviGlitch do
       nil
     end
     a.has_keyframe?.should be false
+  end
+
+  it 'should #remove_all_keyframes!' do
+    a = AviGlitch.open @in
+    a.has_keyframe?.should be true
+    a.remove_all_keyframes!
+    a.has_keyframe?.should be false
+
   end
 
 end

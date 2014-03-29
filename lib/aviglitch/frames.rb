@@ -324,8 +324,8 @@ module AviGlitch
     end
 
     ##
-    # Modify keyframes to deltaframes at given range, or all.
-    def clear_keyframes! range = nil
+    # Motate keyframes into deltaframes at given range, or all.
+    def mutate_keyframes_into_deltaframes! range = nil
       range = 0..self.size if range.nil?
       self.each_with_index do |frame, i|
         if range.include? i
