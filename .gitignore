@@ -2,4 +2,9 @@
 .DS_Store
 coverage
 rdoc
+doc
 pkg
+tmp
+*.gem
+Gemfile.lock
+Guardfile
