@@ -460,7 +460,7 @@ describe AviGlitch::Frames do
     end
   end
 
-  it 'should mutate keyframes into deltaframe with one method' do
+  it 'should mutate keyframes into deltaframe' do
     a = AviGlitch.open @in
     a.frames.mutate_keyframes_into_deltaframes!
     a.output @out
@@ -478,6 +478,36 @@ describe AviGlitch::Frames do
         f.is_keyframe?.should be false
       end
     end
+  end
+
+  it 'should return Enumerator with #each' do
+    a = AviGlitch.open @in
+    enum = a.frames.each
+    enum.each do |f, i|
+      if f.is_keyframe?
+        f.data = f.data.gsub(/\d/, '')
+      end
+    end
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+    expect(File.size(@out)).to be < File.size(@in)
+  end
+
+  it 'should use Enumerator as an external iterator',
+     :skip => Gem::Version.new(RUBY_VERSION.dup) < Gem::Version.new('1.9.0') || RUBY_PLATFORM == 'java' do
+    a = AviGlitch.open @in
+    e = a.frames.each
+    expect {
+      while f = e.next do
+        expect(f).to be_a(AviGlitch::Frame)
+        if f.is_keyframe?
+          f.data = f.data.gsub(/\d/, '')
+        end
+      end
+    }.to raise_error(StopIteration)
+    a.output @out
+    AviGlitch::Base.surely_formatted?(@out, true).should be true
+    expect(File.size(@out)).to be < File.size(@in)
   end
 
 end

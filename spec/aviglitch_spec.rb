@@ -52,13 +52,24 @@ describe AviGlitch do
 
   it 'can glitch each keyframe with index' do
     avi = AviGlitch.open @in
+
+    a_size = 0
+    avi.glitch :keyframe do |f|
+      a_size += 1
+      f
+    end
+
+    b_size = 0
     avi.glitch_with_index :keyframe do |kf, idx|
+      b_size += 1
       if idx < 25
         kf.slice(10..kf.size)
       else
         kf
       end
     end
+    expect(a_size).to be == b_size
+
     avi.output @out
     i_size = File.stat(@in).size
     o_size = File.stat(@out).size
@@ -143,7 +154,7 @@ describe AviGlitch do
     AviGlitch::Base.surely_formatted?(@out, true).should be true
   end
 
-  it 'should mutate keyframes into deltaframes with one method' do
+  it 'should mutate keyframes into deltaframes' do
     a = AviGlitch.open @in
     a.mutate_keyframes_into_deltaframes!
     a.output @out

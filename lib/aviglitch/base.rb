@@ -59,27 +59,31 @@ module AviGlitch
     # It also requires a block. In the block, you take the frame data
     # as a String parameter.
     # To modify the data, simply return a modified data.
-    # It returns +self+
+    # With a block it returns Enumerator, without a block it returns +self+.
     def glitch target = :all, &block  # :yield: data
-      @frames.each do |frame|
-        if valid_target? target, frame
-          frame.data = yield frame.data
+      if block_given?
+        @frames.each do |frame|
+          if valid_target? target, frame
+            frame.data = yield frame.data
+          end
         end
+        self
+      else
+        self.enum_for :glitch, target
       end
-      self
     end
 
     ##
     # Do glitch with index.
     def glitch_with_index target = :all, &block  # :yield: data, index
-      i = 0
-      @frames.each do |frame|
-        if valid_target? target, frame
-          frame.data = yield(frame.data, i)
-          i += 1
+      if block_given?
+        self.glitch(target).with_index do |x, i|
+          yield x, i
         end
+        self
+      else
+        self.glitch target
       end
-      self
     end
 
     ##

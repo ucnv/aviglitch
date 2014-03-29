@@ -18,8 +18,10 @@ module AviGlitch
   class Frames
     include Enumerable
 
-    SAFE_FRAMES_COUNT = 150000              #:nodoc:
-    @@warn_if_frames_are_too_large = true   #:nodoc:
+    # :stopdoc:
+    SAFE_FRAMES_COUNT = 150000
+    @@warn_if_frames_are_too_large = true
+    # :startdoc:
 
     attr_reader :meta
 
@@ -56,11 +58,16 @@ module AviGlitch
 
     ##
     # Enumerates the frames.
+    # It returns Enumerator if a block is not given.
     def each
-      temp = Tempfile.new 'frames'
-      frames_data_as_io(temp, Proc.new)
-      overwrite temp
-      temp.close!
+      if block_given?
+        temp = Tempfile.new 'frames'
+        frames_data_as_io(temp, Proc.new)
+        overwrite temp
+        temp.close!
+      else
+        self.enum_for :each
+      end
     end
 
     ##
