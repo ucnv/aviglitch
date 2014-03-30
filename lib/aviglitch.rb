@@ -15,7 +15,7 @@ require 'aviglitch/tempfile'
 # You can manipulate each frame, like:
 #
 #   avi = AviGlitch.open '/path/to/your.avi'
-#   avi.frames.each |frame|
+#   avi.frames.each do |frame|
 #     if frame.is_keyframe?
 #       frame.data = frame.data.gsub(/\d/, '0')
 #     end
@@ -29,9 +29,6 @@ require 'aviglitch/tempfile'
 #     data.gsub(/\d/, '0')
 #   end
 #   avi.output '/path/to/broken.avi'
-#
-#--
-# It does not support AVI2, interleave format.
 #
 module AviGlitch
 

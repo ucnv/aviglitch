@@ -1,11 +1,9 @@
 # AviGlitch
 [![Build Status](https://travis-ci.org/ucnv/aviglitch.svg?branch=master)](https://travis-ci.org/ucnv/aviglitch)
 
-* <http://ucnv.github.com/aviglitch/>
-
 AviGlitch destroys your AVI files.
 
-I can't explain why they're going to destroy their own data, but they does.
+I can't explain why they're going to destroy their own data, but they do.
 
 You can find a short guide at <http://ucnv.github.com/aviglitch/>.
 It provides a way to manipulate the data in each AVI frames.
