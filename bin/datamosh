@@ -34,10 +34,18 @@ opts = OptionParser.new do |opts|
   end
 end
 
-input = Dir.glob opts.parse!
+input = opts.parse!
 if input.empty?
   puts opts
   exit 1
+else
+  input.each do |file|
+    if !File.exist?(file) || File.directory?(file)
+      opts.banner = "#{file}: No such file.\n\n"
+      puts opts
+      exit 1
+    end
+  end
 end
 
 a = AviGlitch.open input.shift
