@@ -106,20 +106,19 @@ module AviGlitch
         exit
       end
       # Overwrite the file
-      data.seek 0, IO::SEEK_END
       @io.pos = @pos_of_movi - 4  # 4 for size
       @io.print [data.pos + 4].pack('V')  # 4 for 'movi'
       @io.print 'movi'
       data.rewind
-      while d = data.read(1024) do
+      while d = data.read(BUFFER_SIZE) do
         @io.print d
       end
       @io.print 'idx1'
       @io.print [@meta.size * 16].pack('V')
-      @meta.each do |m|
-        @io.print m[:id]
-        @io.print [m[:flag], m[:offset], m[:size]].pack('V3')
-      end
+      idx = @meta.collect { |m|
+        m[:id] + [m[:flag], m[:offset], m[:size]].pack('V3')
+      }.join
+      @io.print idx
       eof = @io.pos
       @io.truncate eof
 
@@ -159,7 +158,7 @@ module AviGlitch
       this_data.seek 0, IO::SEEK_END
       this_size = this_data.pos
       other_data.rewind
-      while d = other_data.read(1024) do
+      while d = other_data.read(BUFFER_SIZE) do
         this_data.print d
       end
       other_data.close!

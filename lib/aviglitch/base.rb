@@ -19,7 +19,7 @@ module AviGlitch
         # copy as tempfile
         @file = Tempfile.open 'aviglitch'
         f.rewind
-        while d = f.read(1024) do
+        while d = f.read(BUFFER_SIZE) do
           @file.print d
         end
       end

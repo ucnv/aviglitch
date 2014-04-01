@@ -34,6 +34,8 @@ module AviGlitch
 
   VERSION = '0.1.3'
 
+  BUFFER_SIZE = 2 ** 24
+
   class << self
     ##
     # Returns AviGlitch::Base instance.
