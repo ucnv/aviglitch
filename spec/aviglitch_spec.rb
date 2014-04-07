@@ -188,6 +188,23 @@ describe AviGlitch do
     a.has_keyframe?.should be true
     a.remove_all_keyframes!
     a.has_keyframe?.should be false
+  end
+
+  it 'should count same number of specific frames' do
+    a = AviGlitch.open @in
+    dc1 = 0
+    dc2 = 0
+    a.frames.each do |f|
+      dc1 += 1 if f.is_deltaframe?
+    end
+    a.glitch(:deltaframe) do |d|
+      dc2 += 1
+      d
+    end
+
+    expect(dc1).to eq(dc2)
+
+
 
   end
 

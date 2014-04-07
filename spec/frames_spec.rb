@@ -510,4 +510,51 @@ describe AviGlitch::Frames do
     expect(File.size(@out)).to be < File.size(@in)
   end
 
+  it 'should count the size of specific frames' do
+    a = AviGlitch.open @in
+    f = a.frames
+
+    kc1 = f.size_of :keyframes
+    kc2 = f.size_of :keyframe
+    kc3 = f.size_of :iframes
+    kc4 = f.size_of :iframe
+
+    dc1 = f.size_of :deltaframes
+    dc2 = f.size_of :deltaframe
+    dc3 = f.size_of :pframes
+    dc4 = f.size_of :pframe
+
+    vc1 = f.size_of :videoframes
+    vc2 = f.size_of :videoframe
+
+    ac1 = f.size_of :audioframes
+    ac2 = f.size_of :audioframe
+
+    kc = dc = vc = ac = 0
+    a.frames.each do |x|
+      vc += x.is_videoframe? ? 1 : 0
+      kc += x.is_keyframe? ? 1 : 0
+      dc += x.is_deltaframe? ? 1 : 0
+      ac += x.is_audioframe? ? 1 : 0
+    end
+
+    a.close
+
+    expect(kc1).to eq(kc)
+    expect(kc2).to eq(kc)
+    expect(kc3).to eq(kc)
+    expect(kc4).to eq(kc)
+
+    expect(dc1).to eq(dc)
+    expect(dc2).to eq(dc)
+    expect(dc3).to eq(dc)
+    expect(dc4).to eq(dc)
+
+    expect(vc1).to eq(vc)
+    expect(vc2).to eq(vc)
+
+    expect(ac1).to eq(ac)
+    expect(ac2).to eq(ac)
+  end
+
 end

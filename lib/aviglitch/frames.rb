@@ -76,6 +76,15 @@ module AviGlitch
       @meta.size
     end
 
+    ##
+    # Returns the number of the specific +frame_type+.
+    def size_of frame_type
+      detection = "is_#{frame_type.to_s.sub(/frames$/, 'frame')}?"
+      @meta.select { |m|
+        Frame.new(nil, m[:id], m[:flag]).send detection
+      }.size
+    end
+
     def frames_data_as_io io = nil, block = nil  #:nodoc:
       io = Tempfile.new('tmep') if io.nil?
       @meta = @meta.select do |m|
