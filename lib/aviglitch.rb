@@ -32,7 +32,7 @@ require 'aviglitch/tempfile'
 #
 module AviGlitch
 
-  VERSION = '0.1.3'
+  VERSION = '0.1.4'
 
   BUFFER_SIZE = 2 ** 24
 

@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = AviGlitch::VERSION
   spec.authors       = ["ucnv"]
   spec.email         = ["ucnvvv@gmail.com"]
-  spec.description   = %q{AviGlitch to destroys your AVI files.
+  spec.description   = %q{AviGlitch destroys your AVI files.
     This library provides ways to manipulate data in each AVI frames.
     It can easily generate keyframes-removed video known as "datamoshing".
   }
@@ -21,7 +21,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.has_rdoc = true
+  spec.extra_rdoc_files = ["README.md", "LICENSE"]
+  spec.rdoc_options << "-m" << "README.md"
+
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake", ">= 2.0.0"
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rspec", "~> 2.0"
+  spec.add_development_dependency "rdoc", "~> 4.0"
 end
