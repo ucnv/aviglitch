@@ -40,7 +40,7 @@ module AviGlitch
     ##
     # Returns AviGlitch::Base instance.
     # It requires +path_or_frames+ as String or Pathname, or Frames instance.
-    def AviGlitch.open path_or_frames
+    def open path_or_frames
       if path_or_frames.kind_of?(Frames)
         path_or_frames.to_avi
       else
