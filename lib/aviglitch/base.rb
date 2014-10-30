@@ -17,7 +17,7 @@ module AviGlitch
     def initialize path
       File.open(path, 'rb') do |f|
         # copy as tempfile
-        @file = Tempfile.open 'aviglitch'
+        @file = Tempfile.new 'aviglitch', binmode: true
         f.rewind
         while d = f.read(BUFFER_SIZE) do
           @file.print d
@@ -28,7 +28,6 @@ module AviGlitch
         raise 'Unsupported file passed.'
       end
       @frames = Frames.new @file
-      # I believe Ruby's GC to close and remove the Tempfile..
     end
 
     ##
@@ -147,8 +146,6 @@ module AviGlitch
         is_io = file.respond_to?(:seek)  # Probably IO.
         file = File.open(file, 'rb') unless is_io
         begin
-          file.seek 0, IO::SEEK_END
-          eof = file.pos
           file.rewind
           unless file.read(4) == 'RIFF'
             answer = false

@@ -61,7 +61,7 @@ module AviGlitch
     # It returns Enumerator if a block is not given.
     def each
       if block_given?
-        temp = Tempfile.new 'frames'
+        temp = Tempfile.new 'frames', binmode: true
         frames_data_as_io(temp, Proc.new)
         overwrite temp
         temp.close!
@@ -86,7 +86,7 @@ module AviGlitch
     end
 
     def frames_data_as_io io = nil, block = nil  #:nodoc:
-      io = Tempfile.new('tmep') if io.nil?
+      io = Tempfile.new('tmep', binmode: true) if io.nil?
       @meta = @meta.select do |m|
         @io.pos = @pos_of_movi + m[:offset] + 8   # 8 for id and size
         frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
@@ -160,12 +160,11 @@ module AviGlitch
     def concat other_frames
       raise TypeError unless other_frames.kind_of?(Frames)
       # data
-      this_data = Tempfile.new 'this'
+      this_data = Tempfile.new 'this', binmode: true
       self.frames_data_as_io this_data
-      other_data = Tempfile.new 'other'
+      other_data = Tempfile.new 'other', binmode: true
       other_frames.frames_data_as_io other_data
-      this_data.seek 0, IO::SEEK_END
-      this_size = this_data.pos
+      this_size = this_data.size
       other_data.rewind
       while d = other_data.read(BUFFER_SIZE) do
         this_data.print d
@@ -293,10 +292,9 @@ module AviGlitch
     def push frame
       raise TypeError unless frame.kind_of? Frame
       # data
-      this_data = Tempfile.new 'this'
+      this_data = Tempfile.new 'this', binmode: true
       self.frames_data_as_io this_data
-      this_data.seek 0, IO::SEEK_END
-      this_size = this_data.pos
+      this_size = this_data.size
       this_data.print frame.id
       this_data.print [frame.data.size].pack('V')
       this_data.print frame.data
