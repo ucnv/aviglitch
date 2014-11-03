@@ -8,3 +8,4 @@ tmp
 *.gem
 Gemfile.lock
 Guardfile
+.yardoc

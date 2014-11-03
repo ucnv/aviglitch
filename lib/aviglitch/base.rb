@@ -58,7 +58,7 @@ module AviGlitch
     # It also requires a block. In the block, you take the frame data
     # as a String parameter.
     # To modify the data, simply return a modified data.
-    # With a block it returns Enumerator, without a block it returns +self+.
+    # Without a block it returns Enumerator, with a block it returns +self+.
     def glitch target = :all, &block  # :yield: data
       if block_given?
         @frames.each do |frame|

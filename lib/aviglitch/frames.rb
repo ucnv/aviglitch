@@ -19,8 +19,11 @@ module AviGlitch
     include Enumerable
 
     # :stopdoc:
+
+    ##
     SAFE_FRAMES_COUNT = 150000
     @@warn_if_frames_are_too_large = true
+
     # :startdoc:
 
     attr_reader :meta
