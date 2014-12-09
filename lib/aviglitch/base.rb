@@ -113,6 +113,7 @@ module AviGlitch
       self.glitch :keyframe do |f|
         nil
       end
+      self
     end
 
     ##

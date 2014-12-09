@@ -183,6 +183,7 @@ module AviGlitch
       # close
       overwrite this_data
       this_data.close!
+      self
     end
 
     ##
@@ -348,6 +349,7 @@ module AviGlitch
           frame.flag = 0 if frame.is_keyframe?
         end
       end
+      self
     end
 
     ##
