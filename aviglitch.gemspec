@@ -8,11 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = AviGlitch::VERSION
   spec.authors       = ["ucnv"]
   spec.email         = ["ucnvvv@gmail.com"]
-  spec.description   = %q{AviGlitch destroys your AVI files.
-    This library provides ways to manipulate data in each AVI frames.
-    It can easily generate keyframes-removed video known as "datamoshing".
-  }
   spec.summary       = %q{A Ruby library to destroy your AVI files.}
+  spec.description   = spec.summary
   spec.homepage      = "http://ucnv.github.com/aviglitch/"
   spec.license       = "MIT"
 

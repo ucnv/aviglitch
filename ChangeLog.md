@@ -1,3 +1,8 @@
+### 0.1.5 / 2014-12-12
+
+* Fix Frames#concat and two other method to return self.
+* Some internal changes.
+
 ### 0.1.4 / 2014-04-10
 
 * Added an enumerator style on AviGlitch::Base#glitch and

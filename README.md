@@ -34,6 +34,8 @@ It creates the keyframes removed video.
   $ datamosh /path/to/your.avi -o /path/to/broken.avi
 ```
 
+For more practical usages, please check <https://github.com/ucnv/aviglitch-utils/tree/master/bin>.
+
 ## Installation
 
 ```sh
