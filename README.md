@@ -5,7 +5,7 @@ AviGlitch destroys your AVI files.
 
 I can't explain why they're going to destroy their own data, but they do.
 
-You can find a short guide at <http://ucnv.github.com/aviglitch/>.
+You can find a short guide at <http://ucnv.github.io/aviglitch/>.
 It provides a way to manipulate the data in each AVI frames.
 It will mostly be used for making datamoshing videos.
 It parses only container level structure, doesn't parse codecs.
