@@ -62,10 +62,10 @@ module AviGlitch
     ##
     # Enumerates the frames.
     # It returns Enumerator if a block is not given.
-    def each
+    def each &block
       if block_given?
         temp = Tempfile.new 'frames', binmode: true
-        frames_data_as_io(temp, Proc.new)
+        frames_data_as_io(temp, block)
         overwrite temp
         temp.close!
       else
