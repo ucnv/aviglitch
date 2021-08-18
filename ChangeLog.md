@@ -1,6 +1,6 @@
 ### 0.1.6 / 2021-08-21
 
-* Removed obsolate dependencies.
+* Removed obsolete dependencies.
 
 ### 0.1.5 / 2014-12-12
 
