@@ -1,3 +1,7 @@
+### 0.1.6 / 2021-08-21
+
+* Removed obsolate dependencies.
+
 ### 0.1.5 / 2014-12-12
 
 * Fix Frames#concat and two other method to return self.
