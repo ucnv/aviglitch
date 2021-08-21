@@ -1,4 +1,0 @@
-language: ruby
-rvm:
-  - 3.0.2
-  - 2.7.4

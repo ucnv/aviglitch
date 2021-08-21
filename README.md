@@ -1,5 +1,7 @@
 # AviGlitch
-[![Build Status](https://travis-ci.org/ucnv/aviglitch.svg?branch=master)](https://travis-ci.org/ucnv/aviglitch)
+
+[![Gem Version](https://badge.fury.io/rb/aviglitch.svg)](https://badge.fury.io/rb/aviglitch)
+[![test](https://github.com/ucnv/aviglitch/actions/workflows/ruby.yml/badge.svg)](https://github.com/ucnv/aviglitch/actions/workflows/ruby.yml)
 
 AviGlitch destroys your AVI files.
 
