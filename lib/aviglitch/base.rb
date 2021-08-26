@@ -7,33 +7,29 @@ module AviGlitch
 
     # AviGlitch::Frames object generated from the +file+.
     attr_reader :frames
-    # The input file (copied tempfile).
-    attr_reader :file
+    # The input file
+    attr_reader :avi
 
     ##
     # Creates a new instance of AviGlitch::Base, open the file and 
     # make it ready to manipulate.
-    # It requires +path+ as Pathname.
-    def initialize path
-      File.open(path, 'rb') do |f|
-        # copy as tempfile
-        @file = Tempfile.new 'aviglitch', binmode: true
-        f.rewind
-        while d = f.read(BUFFER_SIZE) do
-          @file.print d
+    # It requires +path+ as Pathname or an instance of AviGlirtch::Avi.
+    def initialize path_or_object
+      if path_or_object.kind_of?(Avi)
+        @avi = path_or_object
+      else
+        unless AviGlitch::Base.surely_formatted? path_or_object
+          raise 'Unsupported file passed.'
         end
+        @avi = Avi.new path_or_object
       end
-
-      unless AviGlitch::Base.surely_formatted? @file
-        raise 'Unsupported file passed.'
-      end
-      @frames = Frames.new @file
+      @frames = Frames.new @avi
     end
 
     ##
     # Outputs the glitched file to +path+, and close the file.
     def output path, do_file_close = true
-      FileUtils.cp @file.path, path
+      @avi.output path
       close if do_file_close
       self
     end
@@ -41,7 +37,7 @@ module AviGlitch
     ##
     # An explicit file close.
     def close
-      @file.close!
+      @avi.close
     end
 
     ##

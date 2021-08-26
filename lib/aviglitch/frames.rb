@@ -26,37 +26,39 @@ module AviGlitch
 
     # :startdoc:
 
-    attr_reader :meta
+    attr_reader :avi
 
     ##
     # Creates a new AviGlitch::Frames object.
-    def initialize io
+    def initialize avi
+      @avi = avi
+      io = avi.movi
       io.rewind
-      io.pos = 12 # /^RIFF[\s\S]{4}AVI $/
-      while io.read(4) =~ /^(?:LIST|JUNK)$/ do
-        s = io.read(4).unpack('V').first
-        @pos_of_movi = io.pos - 4 if io.read(4) == 'movi'
-        io.pos += s - 4
-      end
-      @pos_of_idx1 = io.pos - 4 # here must be idx1
-      s = io.read(4).unpack('V').first + io.pos
-      @meta = []
-      while chunk_id = io.read(4) do
-        break if io.pos >= s
-        @meta << {
-          :id     => chunk_id,
-          :flag   => io.read(4).unpack('V').first,
-          :offset => io.read(4).unpack('V').first,
-          :size   => io.read(4).unpack('V').first,
-        }
-      end
-      fix_offsets_if_needed io
-      unless safe_frames_count? @meta.size
+      # io.pos = 12 # /^RIFF[\s\S]{4}AVI $/
+      # while io.read(4) =~ /^(?:LIST|JUNK)$/ do
+      #   s = io.read(4).unpack('V').first
+      #   @pos_of_movi = io.pos - 4 if io.read(4) == 'movi'
+      #   io.pos += s - 4
+      # end
+      # @pos_of_idx1 = io.pos - 4 # here must be idx1
+      # s = io.read(4).unpack('V').first + io.pos
+      # @meta = []
+      # while chunk_id = io.read(4) do
+      #   break if io.pos >= s
+      #   @meta << {
+      #     :id     => chunk_id,
+      #     :flag   => io.read(4).unpack('V').first,
+      #     :offset => io.read(4).unpack('V').first,
+      #     :size   => io.read(4).unpack('V').first,
+      #   }
+      # end
+      # fix_offsets_if_needed io
+      unless safe_frames_count? avi.indices.size
         io.close!
         exit
       end
       io.rewind
-      @io = io
+      # @io = io
     end
 
     ##
@@ -76,27 +78,27 @@ module AviGlitch
     ##
     # Returns the number of frames.
     def size
-      @meta.size
+      @avi.indices.size
     end
 
     ##
     # Returns the number of the specific +frame_type+.
     def size_of frame_type
       detection = "is_#{frame_type.to_s.sub(/frames$/, 'frame')}?"
-      @meta.select { |m|
+      @avi.indices.select { |m|
         Frame.new(nil, m[:id], m[:flag]).send detection
       }.size
     end
 
     def frames_data_as_io io = nil, block = nil  #:nodoc:
       io = Tempfile.new('tmep', binmode: true) if io.nil?
-      @meta = @meta.select do |m|
-        @io.pos = @pos_of_movi + m[:offset] + 8   # 8 for id and size
-        frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
+      @avi.indices = @avi.indices.select do |m|
+        @avi.movi.pos = m[:offset] + 8   # 8 for id and size
+        frame = Frame.new(@avi.movi.read(m[:size]), m[:id], m[:flag])
         block.call(frame) if block    # accept the variable block as Proc
         yield frame if block_given?   # or a given block (or do nothing)
         unless frame.data.nil?
-          m[:offset] = io.pos + 4   # 4 for 'movi'
+          m[:offset] = io.pos
           m[:size] = frame.data.size
           m[:flag] = frame.flag
           m[:id] = frame.id
@@ -113,46 +115,24 @@ module AviGlitch
     end
 
     def overwrite data  #:nodoc:
-      unless safe_frames_count? @meta.size
-        @io.close!
+      # TODO: confirm if it is needed in this class
+      unless safe_frames_count? @avi.indices.size
+        @avi.movi.close!
         exit
       end
-      # Overwrite the file
-      @io.pos = @pos_of_movi - 4  # 4 for size
-      @io.print [data.pos + 4].pack('V')  # 4 for 'movi'
-      @io.print 'movi'
+      @avi.movi.rewind
       data.rewind
       while d = data.read(BUFFER_SIZE) do
-        @io.print d
+        @avi.movi.print d
       end
-      @io.print 'idx1'
-      @io.print [@meta.size * 16].pack('V')
-      idx = @meta.collect { |m|
-        m[:id] + [m[:flag], m[:offset], m[:size]].pack('V3')
-      }.join
-      @io.print idx
-      eof = @io.pos
-      @io.truncate eof
-
-      # Fix info
-      ## file size
-      @io.pos = 4
-      @io.print [eof - 8].pack('V')
-      ## frame count
-      @io.pos = 48
-      vid_frames = @meta.select do |m|
-        id = m[:id]
-        id[2, 2] == 'db' || id[2, 2] == 'dc'
-      end
-      @io.print [vid_frames.size].pack('V')
-
-      @io.pos
+      eof = @avi.movi.pos
+      @avi.movi.truncate eof
     end
 
     ##
     # Removes all frames and returns self.
     def clear
-      @meta = []
+      @avi.indices = []
       overwrite StringIO.new
       self
     end
@@ -174,12 +154,12 @@ module AviGlitch
       end
       other_data.close!
       # meta
-      other_meta = other_frames.meta.collect do |m|
+      other_meta = other_frames.avi.indices.collect do |m|
         x = m.dup
         x[:offset] += this_size
         x
       end
-      @meta.concat other_meta
+      @avi.indices.concat other_meta
       # close
       overwrite this_data
       this_data.close!
@@ -271,11 +251,11 @@ module AviGlitch
     ##
     # Returns one Frame object at the given index.
     def at n
-      m = @meta[n]
+      m = @avi.indices[n]
       return nil if m.nil?
-      @io.pos = @pos_of_movi + m[:offset] + 8
-      frame = Frame.new(@io.read(m[:size]), m[:id], m[:flag])
-      @io.rewind
+      @avi.movi.pos = m[:offset] + 8
+      frame = Frame.new(@avi.movi.read(m[:size]), m[:id], m[:flag])
+      @avi.movi.rewind
       frame
     end
 
@@ -303,11 +283,11 @@ module AviGlitch
       this_data.print [frame.data.size].pack('V')
       this_data.print frame.data
       this_data.print "\000" if frame.data.size % 2 == 1
-      # meta
-      @meta << {
+      # index
+      @avi.indices << {
         :id     => frame.id,
         :flag   => frame.flag,
-        :offset => this_size + 4, # 4 for 'movi'
+        :offset => this_size,
         :size   => frame.data.size,
       }
       # close
@@ -355,17 +335,17 @@ module AviGlitch
     ##
     # Returns true if +other+'s frames are same as self's frames.
     def == other
-      @meta == other.meta
+      @avi.indices == other.avi.indices
     end
 
     ##
     # Generates new AviGlitch::Base instance using self.
     def to_avi
-      AviGlitch.open @io.path
+      AviGlitch::Base.new @avi.clone
     end
 
     def inspect # :nodec:
-      "#<#{self.class.name}:#{sprintf("0x%x", object_id)} @io=#{@io.inspect} size=#{self.size}>"
+      "#<#{self.class.name}:#{sprintf("0x%x", object_id)} size=#{self.size}>"
     end
 
     def get_beginning_and_length *args #:nodoc:
@@ -373,10 +353,10 @@ module AviGlitch
       if args.first.kind_of? Range
         r = args.first
         b = r.begin
-        e = r.end >= 0 ? r.end : @meta.size + r.end
+        e = r.end >= 0 ? r.end : self.size + r.end
         l = e - b + 1
       end
-      b = b >= 0 ? b : @meta.size + b
+      b = b >= 0 ? b : self.size + b
       [b, l]
     end
 
@@ -384,7 +364,7 @@ module AviGlitch
       r = true
       if @@warn_if_frames_are_too_large && count >= SAFE_FRAMES_COUNT
         trap(:INT) do
-          @io.close!
+          @avi.close
           exit
         end
         m = ["WARNING: The avi data has too many frames (#{count}).\n",
@@ -398,21 +378,7 @@ module AviGlitch
       r
     end
 
-    def fix_offsets_if_needed io #:nodoc:
-      # rarely data offsets begin from 0 of the file
-      return if @meta.empty?
-      pos = io.pos
-      m = @meta.first
-      io.pos = @pos_of_movi + m[:offset]
-      unless io.read(4) == m[:id]
-        @meta.each do |x|
-          x[:offset] -= @pos_of_movi
-        end
-      end
-      io.pos = pos
-    end
-
-    protected :frames_data_as_io, :meta
-    private :overwrite, :get_beginning_and_length, :fix_offsets_if_needed
+    protected :frames_data_as_io
+    private :overwrite, :get_beginning_and_length
   end
 end

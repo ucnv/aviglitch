@@ -5,11 +5,11 @@ describe AviGlitch::Frames do
   before :all do
     AviGlitch::Frames.class_eval do
       define_method(:get_real_id_with) do |frame|
-        pos = @io.pos
-        @io.pos -= frame.data.size
-        @io.pos -= 8
-        id = @io.read 4
-        @io.pos = pos
+        pos = @avi.movi.pos
+        @avi.movi.pos -= frame.data.size
+        @avi.movi.pos -= 8
+        id = @avi.movi.read 4
+        @avi.movi.pos = pos
         id
       end
     end

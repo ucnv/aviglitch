@@ -203,9 +203,6 @@ describe AviGlitch do
     end
 
     expect(dc1).to eq(dc2)
-
-
-
   end
-
+  
 end

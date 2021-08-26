@@ -4,6 +4,7 @@ require 'readline'
 require 'pathname'
 require 'stringio'
 require 'aviglitch/base'
+require 'aviglitch/avi'
 require 'aviglitch/frame'
 require 'aviglitch/frames'
 
