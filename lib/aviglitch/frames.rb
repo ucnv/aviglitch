@@ -34,31 +34,11 @@ module AviGlitch
       @avi = avi
       io = avi.movi
       io.rewind
-      # io.pos = 12 # /^RIFF[\s\S]{4}AVI $/
-      # while io.read(4) =~ /^(?:LIST|JUNK)$/ do
-      #   s = io.read(4).unpack('V').first
-      #   @pos_of_movi = io.pos - 4 if io.read(4) == 'movi'
-      #   io.pos += s - 4
-      # end
-      # @pos_of_idx1 = io.pos - 4 # here must be idx1
-      # s = io.read(4).unpack('V').first + io.pos
-      # @meta = []
-      # while chunk_id = io.read(4) do
-      #   break if io.pos >= s
-      #   @meta << {
-      #     :id     => chunk_id,
-      #     :flag   => io.read(4).unpack('V').first,
-      #     :offset => io.read(4).unpack('V').first,
-      #     :size   => io.read(4).unpack('V').first,
-      #   }
-      # end
-      # fix_offsets_if_needed io
       unless safe_frames_count? avi.indices.size
         io.close!
         exit
       end
       io.rewind
-      # @io = io
     end
 
     ##
@@ -105,7 +85,7 @@ module AviGlitch
           io.print m[:id]
           io.print [frame.data.size].pack('V')
           io.print frame.data
-          io.print "\000" if frame.data.size % 2 == 1
+          io.print "\0" if frame.data.size % 2 == 1
           true
         else
           false
@@ -282,7 +262,7 @@ module AviGlitch
       this_data.print frame.id
       this_data.print [frame.data.size].pack('V')
       this_data.print frame.data
-      this_data.print "\000" if frame.data.size % 2 == 1
+      this_data.print "\0" if frame.data.size % 2 == 1
       # index
       @avi.indices << {
         :id     => frame.id,
