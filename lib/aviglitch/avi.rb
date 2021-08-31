@@ -5,10 +5,7 @@ module AviGlitch
   # It contains headers, frame's raw data, and indices of frames. 
   # The attribute +movi+ is an IO to handles frames binary and 
   # the +indices+ represents the position of each frame.
-  # This library accesses the data through this class internally.
-  #
-  # This class can parse any RIFF formated file to a ruby object, 
-  # though it especially provides a way to handle AVI frame data.
+  # The AviGlitch library accesses the data through this class internally.
   #
   class Avi
 
@@ -167,7 +164,7 @@ module AviGlitch
     ##
     # Closes the file.
     def close
-      @movi.close
+      @movi.close!
     end
 
     ##
@@ -224,7 +221,7 @@ module AviGlitch
         # odml
         odml = search('hdrl', 'odml').first
         if odml.nil?
-          odml = RiffChunk.new 'odml', 260, [RiffChunk.new('dmlh', 248, "\0" * 248)]
+          odml = RiffChunk.new 'LIST', 260, 'odml', [RiffChunk.new('dmlh', 248, "\0" * 248)]
           @riff.first.child('hdrl').value.push odml
         end
         odml.child('dmlh').value[0, 4] = [@indices.size].pack('V')
@@ -232,7 +229,7 @@ module AviGlitch
         strl.each do |sl|
           indx = sl.child 'indx'
           unless indx.nil?
-            sl.detete indx[0]
+            sl.value.delete indx
           end
         end
       end
@@ -447,7 +444,7 @@ module AviGlitch
       h = 24
       i = 0
       while h + i * 8 < data.size
-        of = offset + data[24 + i * 8, 4].unpack('V').first - 12 # - ('movi' + '00dc' + size) 
+        of = offset + data[24 + i * 8, 4].unpack('V').first - 12 # 12 for movi + 00dc#### 
         sz = data[h + i * 8 + 4, 4].unpack('V').first
         fl = (sz >> 31 == 1) ? 0 : Frame::AVIIF_KEYFRAME # bit 31 is set if this is NOT a keyframe
         zs = sz & 0b0111_1111_1111_1111_1111_1111_1111_1111
@@ -470,7 +467,7 @@ module AviGlitch
         returnable = out.nil? 
         out = StringIO.new if returnable 
 
-        parse = Proc.new do |io, depth = 0, len = 0|
+        parse = ->(io, depth = 0, len = 0) do
           offset = io.pos
           while id = io.read(4) do
             if len > 0 && io.pos >= offset + len
