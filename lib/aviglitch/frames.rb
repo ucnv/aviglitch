@@ -18,14 +18,6 @@ module AviGlitch
   class Frames
     include Enumerable
 
-    # :stopdoc:
-
-    ##
-    SAFE_FRAMES_COUNT = 150000
-    @@warn_if_frames_are_too_large = true
-
-    # :startdoc:
-
     attr_reader :avi
 
     ##
@@ -33,11 +25,6 @@ module AviGlitch
     def initialize avi
       @avi = avi
       io = avi.movi
-      io.rewind
-      unless safe_frames_count? avi.indices.size
-        io.close!
-        exit
-      end
       io.rewind
     end
 
@@ -102,10 +89,6 @@ module AviGlitch
 
     def overwrite data  #:nodoc:
       # TODO: confirm if it is needed in this class
-      unless safe_frames_count? @avi.indices.size
-        @avi.movi.close!
-        exit
-      end
       @avi.movi.rewind
       data.rewind
       while d = data.read(BUFFER_SIZE) do
@@ -347,21 +330,8 @@ module AviGlitch
     end
 
     def safe_frames_count? count #:nodoc:
-      r = true
-      if @@warn_if_frames_are_too_large && count >= SAFE_FRAMES_COUNT
-        trap(:INT) do
-          @avi.close
-          exit
-        end
-        m = ["WARNING: The avi data has too many frames (#{count}).\n",
-          "It may use a large memory to process. ",
-          "We recommend to chop the movie to smaller chunks before you glitch.\n",
-          "Do you want to continue anyway? [yN] "].join('')
-        a = Readline.readline m
-        r = a == 'y'
-        @@warn_if_frames_are_too_large = !r
-      end
-      r
+      warn "[DEPRECATION] `safe_frames_count?` is deprecated."
+      true
     end
 
     protected :frames_data_as_io
