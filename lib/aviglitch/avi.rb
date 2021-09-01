@@ -438,7 +438,7 @@ module AviGlitch
       end
     end
 
-    def parse_avi2_indices data, offset
+    def parse_avi2_indices data, offset #:nodoc:
       id = data[8, 4]
       nent = data[4, 4].unpack('V').first
       h = 24
