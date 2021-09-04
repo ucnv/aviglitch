@@ -76,15 +76,13 @@ module AviGlitch
     # :startdoc:
 
     MAX_RIFF_SIZE = 1024 ** 3
-    # Tempfile instance of "movi" entities.
-    attr_accessor :movi
     # List of indices for +movi+ data.
     attr_accessor :indices
-    # 
+    # Object which represents RIFF structure.
     attr_accessor :riff
-    #
-    attr_accessor :path
-    protected :movi=, :path, :path=
+  
+    attr_accessor :path, :movi
+    protected :path, :path=, :movi, :movi=
 
     ##
     # Generates an instance with a necessary structure from the +path+.
@@ -377,11 +375,17 @@ module AviGlitch
       @riff.first.search *args
     end
 
-    def inspect # :nodec:
+    ##
+    # Returns true if +other+'s indices are same as self's indices.
+    def == other
+      self.indices == other.indices
+    end
+
+    def inspect #:nodoc:
       "#<#{self.class.name}:#{sprintf("0x%x", object_id)} @movi=#{@movi.inspect}>"
     end
 
-    def initialize_copy avi # :nodec:
+    def initialize_copy avi #:nodoc:
       avi.path = @path.dup
       md = Marshal.dump @indices
       avi.indices = Marshal.load md

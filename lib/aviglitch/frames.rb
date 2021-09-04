@@ -24,8 +24,6 @@ module AviGlitch
     # Creates a new AviGlitch::Frames object.
     def initialize avi
       @avi = avi
-      io = avi.movi
-      io.rewind
     end
 
     ##
@@ -68,18 +66,23 @@ module AviGlitch
     end
 
     ##
-    # Returns the data size of total frames.
-    def data_size
-      @avi.movi.size
-    end
-
-    ##
     # Returns the number of the specific +frame_type+.
     def size_of frame_type
       detection = "is_#{frame_type.to_s.sub(/frames$/, 'frame')}?"
       @avi.indices.select { |m|
         Frame.new(nil, m[:id], m[:flag]).send detection
       }.size
+    end
+
+    ##
+    # Returns the data size of total frames.
+    def data_size
+      size = 0
+      @avi.process_movi do |indices, movi|
+        size = movi.size
+        [indices, movi]
+      end
+      size
     end
 
     ##
@@ -202,11 +205,16 @@ module AviGlitch
     ##
     # Returns one Frame object at the given index.
     def at n
-      m = @avi.indices[n]
-      return nil if m.nil?
-      @avi.movi.pos = m[:offset] + 8
-      frame = Frame.new(@avi.movi.read(m[:size]), m[:id], m[:flag])
-      @avi.movi.rewind
+      frame = nil
+      @avi.process_movi do |indices, movi|
+        m = indices[n]
+        unless m.nil?
+          movi.pos = m[:offset] + 8
+          frame = Frame.new(movi.read(m[:size]), m[:id], m[:flag])
+          movi.rewind
+        end
+        [indices, movi]
+      end
       frame
     end
 
@@ -283,7 +291,7 @@ module AviGlitch
     ##
     # Returns true if +other+'s frames are same as self's frames.
     def == other
-      @avi.indices == other.avi.indices
+      @avi == other.avi
     end
 
     ##
@@ -292,7 +300,7 @@ module AviGlitch
       AviGlitch::Base.new @avi.clone
     end
 
-    def inspect # :nodec:
+    def inspect #:nodoc:
       "#<#{self.class.name}:#{sprintf("0x%x", object_id)} size=#{self.size}>"
     end
 
