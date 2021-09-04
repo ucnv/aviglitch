@@ -2,9 +2,7 @@ module AviGlitch
 
   # Avi parses the passed RIFF-AVI file and maintains binary data as 
   # a structured object.
-  # It contains headers, frame's raw data, and indices of frames. 
-  # The attribute +movi+ is an IO to handles frames binary and 
-  # the +indices+ represents the position of each frame.
+  # It contains headers, frame's raw data, and indices of frames.
   # The AviGlitch library accesses the data through this class internally.
   #
   class Avi
@@ -76,12 +74,14 @@ module AviGlitch
     # :startdoc:
 
     MAX_RIFF_SIZE = 1024 ** 3
-    # List of indices for +movi+ data.
+    # List of indices for 'movi' data.
     attr_accessor :indices
     # Object which represents RIFF structure.
     attr_accessor :riff
-  
-    attr_accessor :path, :movi
+    # IO for 'movi' data (protected)
+    attr_accessor :movi
+    # Passed file path (protected)
+    attr_accessor :path
     protected :path, :path=, :movi, :movi=
 
     ##
