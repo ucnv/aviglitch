@@ -342,6 +342,27 @@ module AviGlitch
     end
 
     ##
+    # Provides internal accesses to movi binary data.
+    # It requires the yield block to return an array of pair values 
+    # which consists of new indices array and new movi binary data.
+    def process_movi &block
+      @movi.rewind
+      newindices, newmovi = block.call @indices, @movi
+      unless @indices == newindices
+        @indices.replace newindices
+      end
+      unless @movi == newmovi
+        @movi.rewind
+        newmovi.rewind
+        while d = newmovi.read(BUFFER_SIZE) do
+          @movi.print d
+        end
+        eof = @movi.pos
+        @movi.truncate eof
+      end
+    end
+
+    ##
     # Searches and returns RIFF values with the passed search +args+.
     # +args+ should point the ids of the tree structured RIFF data 
     # under the 'AVI ' chunk without omission, like:
@@ -375,7 +396,7 @@ module AviGlitch
       avi.movi = newmovi
     end
 
-    def print_chunk io, chunk
+    def print_chunk io, chunk  #:nodoc:
       offset = io.pos
       if chunk.is_list?
         io.print chunk.list
@@ -397,7 +418,7 @@ module AviGlitch
       io.print "\0" if size % 2 == 1
     end
 
-    def expected_position_of chunk
+    def expected_position_of chunk  #:nodoc:
       pos = -1
       cur = 12
       seek = -> (chk) do
@@ -421,8 +442,6 @@ module AviGlitch
       end
       pos
     end
-
-    # ----------------------------------------------------------------
 
     def parse_avi1_indices data  #:nodoc:
       # The function Frsmes#fix_offsets_if_needed in previous versions is now removed. 

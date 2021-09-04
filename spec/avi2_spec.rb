@@ -61,13 +61,11 @@ describe AviGlitch, 'AVI2.0' do
 
   it 'should be AVI2.0 when its size has increased over 1GB' do
     a = AviGlitch.open @in1
-    n = 1
-    while a.frames.data_size * n < 1024 ** 3
-      n += 1
-    end
+    n = Math.log(1024.0 ** 3 / a.frames.data_size.to_f, 2).ceil
     f = a.frames[0..-1]
     n.times do
-      f.concat a.frames
+      fx = f[0..-1]
+      f.concat fx
     end
     f.to_avi.output @out
     b = AviGlitch.open @out

@@ -33,10 +33,29 @@ module AviGlitch
     # It returns Enumerator if a block is not given.
     def each &block
       if block_given?
-        temp = Tempfile.new 'frames', binmode: true
-        frames_data_as_io(temp, block)
-        overwrite temp
-        temp.close!
+        Tempfile.open('temp', binmode: true) do |newmovi|
+          @avi.process_movi do |indices, movi|
+            newindices = indices.select do |m|
+              movi.pos = m[:offset] + 8    # 8 for id and size
+              frame = Frame.new(movi.read(m[:size]), m[:id], m[:flag])
+              block.call frame
+              unless frame.data.nil?
+                m[:offset] = newmovi.pos
+                m[:size] = frame.data.size
+                m[:flag] = frame.flag
+                m[:id] = frame.id
+                newmovi.print m[:id]
+                newmovi.print [frame.data.size].pack('V')
+                newmovi.print frame.data
+                newmovi.print "\0" if frame.data.size % 2 == 1
+                true
+              else
+                false
+              end
+            end
+            [newindices, newmovi]
+          end
+        end
       else
         self.enum_for :each
       end
@@ -63,46 +82,12 @@ module AviGlitch
       }.size
     end
 
-    def frames_data_as_io io = nil, block = nil  #:nodoc:
-      io = Tempfile.new('tmep', binmode: true) if io.nil?
-      @avi.indices = @avi.indices.select do |m|
-        @avi.movi.pos = m[:offset] + 8   # 8 for id and size
-        frame = Frame.new(@avi.movi.read(m[:size]), m[:id], m[:flag])
-        block.call(frame) if block    # accept the variable block as Proc
-        yield frame if block_given?   # or a given block (or do nothing)
-        unless frame.data.nil?
-          m[:offset] = io.pos
-          m[:size] = frame.data.size
-          m[:flag] = frame.flag
-          m[:id] = frame.id
-          io.print m[:id]
-          io.print [frame.data.size].pack('V')
-          io.print frame.data
-          io.print "\0" if frame.data.size % 2 == 1
-          true
-        else
-          false
-        end
-      end
-      io
-    end
-
-    def overwrite data  #:nodoc:
-      # TODO: confirm if it is needed in this class
-      @avi.movi.rewind
-      data.rewind
-      while d = data.read(BUFFER_SIZE) do
-        @avi.movi.print d
-      end
-      eof = @avi.movi.pos
-      @avi.movi.truncate eof
-    end
-
     ##
     # Removes all frames and returns self.
     def clear
-      @avi.indices = []
-      overwrite StringIO.new
+      @avi.process_movi do |indices, movi|
+        [[], StringIO.new]
+      end
       self
     end
 
@@ -111,27 +96,24 @@ module AviGlitch
     # It is destructive like Array does.
     def concat other_frames
       raise TypeError unless other_frames.kind_of?(Frames)
-      # data
-      this_data = Tempfile.new 'this', binmode: true
-      self.frames_data_as_io this_data
-      other_data = Tempfile.new 'other', binmode: true
-      other_frames.frames_data_as_io other_data
-      this_size = this_data.size
-      other_data.rewind
-      while d = other_data.read(BUFFER_SIZE) do
-        this_data.print d
+      @avi.process_movi do |this_indices, this_movi|
+        this_size = this_movi.size
+        this_movi.pos = this_size
+        other_frames.avi.process_movi do |other_indices, other_movi|
+          while d = other_movi.read(BUFFER_SIZE) do
+            this_movi.print d
+          end
+          other_meta = other_indices.collect do |m|
+            x = m.dup
+            x[:offset] += this_size
+            x
+          end
+          this_indices.concat other_meta
+          [other_indices, other_movi]
+        end
+        [this_indices, this_movi]
       end
-      other_data.close!
-      # meta
-      other_meta = other_frames.avi.indices.collect do |m|
-        x = m.dup
-        x[:offset] += this_size
-        x
-      end
-      @avi.indices.concat other_meta
-      # close
-      overwrite this_data
-      this_data.close!
+
       self
     end
 
@@ -244,24 +226,21 @@ module AviGlitch
     # Appends the given Frame into the tail of self.
     def push frame
       raise TypeError unless frame.kind_of? Frame
-      # data
-      this_data = Tempfile.new 'this', binmode: true
-      self.frames_data_as_io this_data
-      this_size = this_data.size
-      this_data.print frame.id
-      this_data.print [frame.data.size].pack('V')
-      this_data.print frame.data
-      this_data.print "\0" if frame.data.size % 2 == 1
-      # index
-      @avi.indices << {
-        :id     => frame.id,
-        :flag   => frame.flag,
-        :offset => this_size,
-        :size   => frame.data.size,
-      }
-      # close
-      overwrite this_data
-      this_data.close!
+      @avi.process_movi do |indices, movi|
+        this_size = movi.size
+        movi.pos = this_size
+        movi.print frame.id
+        movi.print [frame.data.size].pack('V')
+        movi.print frame.data
+        movi.print "\0" if frame.data.size % 2 == 1
+        indices << {
+          :id     => frame.id,
+          :flag   => frame.flag,
+          :offset => this_size,
+          :size   => frame.data.size,
+        }
+        [indices, movi]
+      end
       self
     end
 
@@ -334,7 +313,6 @@ module AviGlitch
       true
     end
 
-    protected :frames_data_as_io
-    private :overwrite, :get_beginning_and_length
+    private :get_beginning_and_length
   end
 end

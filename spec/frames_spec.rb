@@ -85,15 +85,6 @@ describe AviGlitch::Frames do
     avi.close
   end
 
-  it 'should hide the inner variables' do
-    avi = AviGlitch.open @in
-    frames = avi.frames
-    lambda { frames.meta }.should raise_error(NoMethodError)
-    lambda { frames.io }.should raise_error(NoMethodError)
-    lambda { frames.frames_data_as_io }.should raise_error(NoMethodError)
-    avi.close
-  end
-
   it 'should save video frames count in header' do
     avi = AviGlitch.open @in
     c = 0

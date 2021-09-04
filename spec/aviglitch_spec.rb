@@ -155,6 +155,7 @@ describe AviGlitch do
   end
 
   it 'should mutate keyframes into deltaframes' do
+    @out = './tmp/test.avi'
     a = AviGlitch.open @in
     a.mutate_keyframes_into_deltaframes!
     a.output @out
