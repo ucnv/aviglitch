@@ -16,12 +16,13 @@ describe AviGlitch, 'datamosh cli' do
       c
     end
     total = a.frames.size
+    first_keyframe = a.frames.index(a.frames.first_of(:keyframe))
     a.close
 
     system [@cmd, @in].join(' ')
     o = AviGlitch.open @out
     o.frames.size.should == total
-    o.frames.first.is_keyframe?.should be true
+    o.frames[first_keyframe].is_keyframe?.should be true
     o.has_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
@@ -29,7 +30,7 @@ describe AviGlitch, 'datamosh cli' do
     system [@cmd, '-a', @in].join(' ')
     o = AviGlitch.open @out
     o.frames.size.should == total
-    o.frames.first.is_keyframe?.should be false
+    o.frames[first_keyframe].is_keyframe?.should be false
     o.has_keyframe?.should be false
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
@@ -37,7 +38,7 @@ describe AviGlitch, 'datamosh cli' do
     system [@cmd, @in, @in, @in].join(' ')
     o = AviGlitch.open @out
     o.frames.size.should == total * 3
-    o.frames.first.is_keyframe?.should be true
+    o.frames[first_keyframe].is_keyframe?.should be true
     o.close
     AviGlitch::Base.surely_formatted?(@out, true).should be true
 

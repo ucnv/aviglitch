@@ -68,9 +68,8 @@ module AviGlitch
     ##
     # Returns the number of the specific +frame_type+.
     def size_of frame_type
-      detection = "is_#{frame_type.to_s.sub(/frames$/, 'frame')}?"
       @avi.indices.select { |m|
-        Frame.new(nil, m[:id], m[:flag]).send detection
+        Frame.new(nil, m[:id], m[:flag]).is? frame_type
       }.size
     end
 
@@ -228,6 +227,82 @@ module AviGlitch
     # Returns the last Frame object.
     def last
       self.slice(self.size - 1)
+    end
+
+    ##
+    # Returns the first Frame object in +frame_type+.
+    def first_of frame_type
+      frame = nil
+      @avi.process_movi do |indices, movi|
+        indices.each do |m|
+          movi.pos = m[:offset] + 8
+          f = Frame.new(movi.read(m[:size]), m[:id], m[:flag])
+          if f.is?(frame_type)
+            frame = f
+            break
+          end
+        end
+        [indices, movi]
+      end
+      frame
+    end
+
+    ##
+    # Returns the last Frame object in +frame_type+.
+    def last_of frame_type
+      frame = nil
+      @avi.process_movi do |indices, movi|
+        indices.reverse.each do |m|
+          movi.pos = m[:offset] + 8
+          f = Frame.new(movi.read(m[:size]), m[:id], m[:flag])
+          if f.is?(frame_type)
+            frame = f
+            break
+          end
+        end
+        [indices, movi]
+      end
+      frame
+    end
+
+    ##
+    # Returns an index of the first found +frame+.
+    def index frame
+      n = -1
+      @avi.process_movi do |indices, movi|
+        indices.each_with_index do |m, i|
+          movi.pos = m[:offset] + 8
+          f = Frame.new(movi.read(m[:size]), m[:id], m[:flag]) 
+          if f == frame
+            n = i
+            break
+          end
+        end
+        [indices, movi]
+      end
+      n
+    end
+
+    ##
+    # Alias for index
+    alias_method :find_index, :index
+
+    ##
+    # Returns an index of the first found +frame+, starting from the last.
+    def rindex frame
+      n = -1
+      @avi.process_movi do |indices, movi|
+        indices.reverse.each_with_index do |m, i|
+          movi.pos = m[:offset] + 8
+          f = Frame.new(movi.read(m[:size]), m[:id], m[:flag])
+          if f == frame
+            n = indices.size - 1 - i
+            break
+          end
+        end
+        [indices, movi]
+      end
+      n
     end
 
     ##

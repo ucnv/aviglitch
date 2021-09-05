@@ -543,4 +543,27 @@ describe AviGlitch::Frames do
     expect(ac2).to eq(ac)
   end
 
+  it 'should pick the first / last frame with a method' do
+    a = AviGlitch.open @in
+    fkidx = -1
+    lkidx = -1
+    faidx = -1
+    laidx = -1
+    a.frames.each_with_index do |f, i|
+      if f.is_keyframe?
+        fkidx = i if fkidx == -1
+        lkidx = i
+      end
+      if f.is_audioframe?
+        faidx = i if faidx == -1
+        laidx = i
+      end
+    end
+    a.frames.index(a.frames.first_of(:keyframe)).should eq(fkidx)
+    a.frames.rindex(a.frames.last_of(:keyframe)).should eq(lkidx)
+    a.frames.index(a.frames.first_of(:audioframe)).should eq(faidx)
+    a.frames.rindex(a.frames.last_of(:audioframe)).should eq(laidx)
+    a.close
+  end
+
 end

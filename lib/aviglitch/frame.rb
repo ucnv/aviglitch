@@ -58,6 +58,26 @@ module AviGlitch
       @id[2, 2] == 'wb'
     end
 
+    ##
+    # Returns if it is a frame in +frame_type+.
+    def is? frame_type
+      return true if frame_type == :all
+      detection = "is_#{frame_type.to_s.sub(/frames$/, 'frame')}?"
+      begin 
+        self.send detection
+      rescue NoMethodError => e
+        false
+      end
+    end
+
+    ##
+    # Compares its content.
+    def == other
+      self.id == other.id &&
+      self.flag == other.flag &&
+      self.data == other.data
+    end
+
   end
 end
 

@@ -58,7 +58,8 @@ module AviGlitch
     def glitch target = :all, &block  # :yield: data
       if block_given?
         @frames.each do |frame|
-          if valid_target? target, frame
+          # if valid_target? target, frame
+          if frame.is? target
             frame.data = yield frame.data
           end
         end

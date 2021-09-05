@@ -54,7 +54,12 @@ unless fake
     (!all && i == 0) ? frame : "" # keep the first frame
   end
 end
-a.mutate_keyframes_into_deltaframes!(!all && !fake ? 1..a.frames.size : nil)
+if !all && !fake 
+  first = a.frames.index(a.frames.first_of(:keyframe))
+  a.mutate_keyframes_into_deltaframes! (first + 1)..a.frames.size
+else
+  a.mutate_keyframes_into_deltaframes!
+end
 
 input.each do |file|
   b = AviGlitch.open file
