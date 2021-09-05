@@ -20,18 +20,6 @@ describe AviGlitch::Frames do
         @movi
       end
     end
-
-    FileUtils.mkdir OUTPUT_DIR unless File.exist? OUTPUT_DIR
-    @in = FILES_DIR + 'sample.avi'
-    @out = OUTPUT_DIR + 'out.avi'
-  end
-
-  after :each do
-    FileUtils.rm Dir.glob((OUTPUT_DIR + '*').to_s)
-  end
-
-  after :all do
-    FileUtils.rmdir OUTPUT_DIR
   end
 
   it 'should save the same file when nothing is changed' do

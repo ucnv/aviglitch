@@ -9,4 +9,4 @@ tmp
 Gemfile.lock
 Guardfile
 .yardoc
-sample2.avi
+spec/files

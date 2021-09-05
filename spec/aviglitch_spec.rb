@@ -2,24 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe AviGlitch do
 
-  before :all do
-    FileUtils.mkdir OUTPUT_DIR unless File.exist? OUTPUT_DIR
-    @in = FILES_DIR + 'sample.avi'
-    @out = OUTPUT_DIR + 'out.avi'
-  end
-
-  after :each do
-    FileUtils.rm Dir.glob((OUTPUT_DIR + '*').to_s)
-  end
-
-  after :all do
-    FileUtils.rmdir OUTPUT_DIR
-  end
-
   it 'should raise an error against unsupported files' do
     lambda {
       avi = AviGlitch.open __FILE__
-    }.should raise_error
+    }.should raise_error(RuntimeError)
   end
 
   it 'should return AviGlitch::Base object through the method #open' do

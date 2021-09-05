@@ -2,41 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe AviGlitch, 'AVI2.0' do
 
-  before :all do
-    FileUtils.mkdir OUTPUT_DIR unless File.exist? OUTPUT_DIR
-    @in1 = FILES_DIR + 'sample.avi'
-    @in2 = FILES_DIR + 'sample2.avi'
-    @out = OUTPUT_DIR + 'out.avi'
-
-    url = 'http://a.ucnv.org/sample2.avi'
-    unless File.exist? @in2
-      puts 'At first test it needs to download a file over 1GB. It will take a while.'
-      puts 'Downloading ' + url
-      $stdout.sync = true
-      u = URI.parse url
-      Net::HTTP.start(u.host, u.port) do |http|
-        res = http.request_head u.path
-        max = res['content-length'].to_i
-        len = 0
-        bl = 75
-        File.open(@in2, 'w') do |file|
-          http.get(u.path) do |chunk|
-            file.write chunk
-            len += chunk.length
-            pct = '%3.1f' % (100.0 * len / max)
-            bar = ('#' * (bl * len / max)).ljust(bl)
-            print "\r#{bar} #{'%5s' % pct}%"
-          end
-        end
-      end
-      puts
-    end
-  end
-
-  after :each do
-    FileUtils.rm Dir.glob((OUTPUT_DIR + '*').to_s)
-  end
-
   it 'should save same file when nothing has changed' do
     avi = AviGlitch.open @in2
     avi.glitch do |d|
@@ -60,7 +25,7 @@ describe AviGlitch, 'AVI2.0' do
   end
 
   it 'should be AVI2.0 when its size has increased over 1GB' do
-    a = AviGlitch.open @in1
+    a = AviGlitch.open @in
     n = Math.log(1024.0 ** 3 / a.frames.data_size.to_f, 2).ceil
     f = a.frames[0..-1]
     n.times do
