@@ -47,9 +47,9 @@ module AviGlitch
 
       def search *args
         a1 = args.shift
-        r = value.filter {|v| 
+        r = value.filter { |v| 
           v.id == a1
-        }.collect {|v|
+        }.collect { |v|
           if args.size > 0
             v.search *args
           else
@@ -78,14 +78,12 @@ module AviGlitch
     attr_accessor :indices
     # Object which represents RIFF structure.
     attr_accessor :riff
-    # IO for 'movi' data (protected)
-    attr_accessor :movi
-    # Passed file path (protected)
-    attr_accessor :path
+
+    attr_accessor :path, :movi #:nodoc:
     protected :path, :path=, :movi, :movi=
 
     ##
-    # Generates an instance with a necessary structure from the +path+.
+    # Generates an instance with the necessary structure from the +path+.
     def initialize path = nil
       return if path.nil?
       @path = path
@@ -181,17 +179,17 @@ module AviGlitch
     # Saves data to AVI formatted file.
     def output path
       @index_pos = 0
-      # prepare headers
+      # prepare headers by reusing existing ones
       strl = search 'hdrl', 'strl'
       if is_avi2?
         # indx
         vid_frames_size = 0
-        @indexinfo = @indices.collect do |ix|
+        @indexinfo = @indices.collect { |ix|
           vid_frames_size += 1 if ix[:id] =~ /d[bc]$/
           ix[:id]
-        end.uniq.sort.collect do |d| 
+        }.uniq.sort.collect { |d| 
           [d, {}]
-        end.to_h  # should be like: {"00dc"=>{}, "01wb"=>{}}
+        }.to_h  # should be like: {"00dc"=>{}, "01wb"=>{}}
         strl.each_with_index do |sl, i|
           indx = sl.child 'indx'
           if indx.nil?
@@ -219,7 +217,9 @@ module AviGlitch
         # odml
         odml = search('hdrl', 'odml').first
         if odml.nil?
-          odml = RiffChunk.new 'LIST', 260, 'odml', [RiffChunk.new('dmlh', 248, "\0" * 248)]
+          odml = RiffChunk.new(
+            'LIST', 260, 'odml', [RiffChunk.new('dmlh', 248, "\0" * 248)]
+          )
           @riff.first.child('hdrl').value.push odml
         end
         odml.child('dmlh').value[0, 4] = [@indices.size].pack('V')
@@ -241,7 +241,9 @@ module AviGlitch
         io.print 'movi'
         while io.pos - data_offset <= MAX_RIFF_SIZE
           ix = @indices[@index_pos]
-          @indexinfo[ix[:id]][:cur] << {pos: io.pos, size: ix[:size], flag: ix[:flag]} if is_avi2?
+          @indexinfo[ix[:id]][:cur] << {
+            pos: io.pos, size: ix[:size], flag: ix[:flag]
+          } if is_avi2?
           io.print ix[:id]
           vid_frames_size += 1 if ix[:id] =~ /d[bc]$/
           io.print [ix[:size]].pack('V')
@@ -275,7 +277,9 @@ module AviGlitch
             indx = info[:indx]
             nent = indx.value[4, 4].unpack('V').first + 1
             indx.value[4, 4] = [nent].pack('V')
-            indx.value[24 + 16 * (nent - 1), 16] = [ix_offset, io.pos - ix_offset, info[:cur].size].pack('qVV')
+            indx.value[24 + 16 * (nent - 1), 16] = [
+              ix_offset, io.pos - ix_offset, info[:cur].size
+            ].pack('qVV')
             io.pos = expected_position_of(indx) + 8
             io.print indx.value
             # clean up
@@ -370,7 +374,7 @@ module AviGlitch
     # It returns a list of RiffChunk object which can be modified directly.
     # (RiffChunk class which is returned through this method also has a #search
     # method with the same interface as this class.)
-    # This method seeks in the first RIFF 'AVI ' tree.
+    # This method only seeks in the first RIFF 'AVI ' tree.
     def search *args
       @riff.first.search *args
     end
@@ -448,7 +452,7 @@ module AviGlitch
     end
 
     def parse_avi1_indices data  #:nodoc:
-      # The function Frsmes#fix_offsets_if_needed in previous versions is now removed. 
+      # The function Frames#fix_offsets_if_needed in prev versions was now removed.
       i = 0
       while i * 16 < data.size do
         @indices << {
@@ -467,26 +471,30 @@ module AviGlitch
       h = 24
       i = 0
       while h + i * 8 < data.size
-        of = offset + data[24 + i * 8, 4].unpack('V').first - 12 # 12 for movi + 00dc#### 
-        sz = data[h + i * 8 + 4, 4].unpack('V').first
-        fl = (sz >> 31 == 1) ? 0 : Frame::AVIIF_KEYFRAME # bit 31 is set if this is NOT a keyframe
-        zs = sz & 0b0111_1111_1111_1111_1111_1111_1111_1111
+        moffset = data[h + i * 8, 4].unpack('V').first
+        msize = data[h + i * 8 + 4, 4].unpack('V').first
+        of = offset + moffset - 12 # 12 for movi + 00dc####
+        # bit 31 is set if this is NOT a keyframe
+        fl = (msize >> 31 == 1) ? 0 : Frame::AVIIF_KEYFRAME
+        sz = msize & 0b0111_1111_1111_1111_1111_1111_1111_1111
         @indices << {
           :id     => id,
           :flag   => fl,
           :offset => of,
-          :size   => zs,
+          :size   => sz,
         }
         i += 1
       end
     end
 
-    private :parse_avi1_indices, :parse_avi2_indices
+    private :print_chunk, :expected_position_of, 
+            :parse_avi1_indices, :parse_avi2_indices
 
     class << self
+
       ##
-      # Parses RIFF structured file from +path+ and returns a formatted +String+.
-      def rifftree path, out = nil
+      # Parses the +file+ and returns the RIFF structure.
+      def rifftree file, out = nil
         returnable = out.nil? 
         out = StringIO.new if returnable 
 
@@ -501,23 +509,27 @@ module AviGlitch
             str = depth > 0 ? '   ' * depth + id : id
             if id =~ /^(?:RIFF|LIST)$/
               lid = io.read(4)
-              str << ' (%d)' % size
-              str << ' ’' + lid + '’'
+              str << (' (%d)' % size) + " ’#{lid}’\n"
               out.print str
-              out.print "\n"
               parse.call io, depth + 1, size
             else
-              str << ' (%d)' % size
+              str << (' (%d)' % size ) + "\n"
               out.print str
-              out.print "\n"
               io.pos += size
               io.pos += 1 if size % 2 == 1
             end
           end
         end
       
-        open(path, 'rb') do |io|
+        io = file
+        is_io = file.respond_to?(:seek)  # Probably IO.
+        io = File.open(file, 'rb') unless is_io
+        begin
+          io.rewind
           parse.call io
+          io.rewind
+        ensure
+          io.close unless is_io
         end
         
         if returnable
@@ -527,12 +539,12 @@ module AviGlitch
       end
 
       ##
-      # Parses RIFF structured file from +path+ and prints the result to stdout.
-      def print_rifftree path   
-        Avi.rifftree path, $stdout
+      # Parses the +file+ and prints the RIFF structure to stdout.
+      def print_rifftree file   
+        Avi.rifftree file, $stdout
       end
 
     end
-  end
 
+  end
 end

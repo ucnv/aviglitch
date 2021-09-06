@@ -58,7 +58,6 @@ module AviGlitch
     def glitch target = :all, &block  # :yield: data
       if block_given?
         @frames.each do |frame|
-          # if valid_target? target, frame
           if frame.is? target
             frame.data = yield frame.data
           end
@@ -124,55 +123,29 @@ module AviGlitch
     alias_method :write, :output
     alias_method :has_keyframes?, :has_keyframe?
 
-    def valid_target? target, frame #:nodoc:
-      return true if target == :all
-      begin
-        frame.send "is_#{target.to_s.sub(/frames$/, 'frame')}?"
-      rescue
-        false
-      end
-    end
-
-    private :valid_target?
-
     class << self
       ##
       # Checks if the +file+ is a correctly formetted AVI file.
       # +file+ can be String or Pathname or IO.
       def surely_formatted? file, debug = false
-        answer = true
-        is_io = file.respond_to?(:seek)  # Probably IO.
-        file = File.open(file, 'rb') unless is_io
+        passed = true
         begin
-          file.rewind
-          unless file.read(4) == 'RIFF'
-            answer = false
-            warn 'RIFF sign is not found' if debug
+          riff = Avi.rifftree file
+          {
+            'RIFF-AVI sign': /^RIFF \(\d+\) ’AVI ’$/,
+            'movi': /^\s+LIST \(\d+\) ’movi’$/,
+            'idx1': /^\s+idx1 \(\d+\)$/
+          }.each do |m, r|
+            unless riff =~ r
+              warn "#{m} is not found." if debug
+              passed = false
+            end
           end
-          len = file.read(4).unpack('V').first
-          unless file.read(4) == 'AVI '
-            answer = false
-            warn 'AVI sign is not found' if debug
-          end
-          while file.read(4) =~ /^(?:LIST|JUNK)$/ do
-            s = file.read(4).unpack('V').first
-            file.pos += s
-          end
-          file.pos -= 4
-          # we require idx1
-          unless file.read(4) == 'idx1'
-            answer = false
-            warn 'idx1 is not found' if debug
-          end
-          s = file.read(4).unpack('V').first
-          file.pos += s
-        rescue => err
-          warn err.message if debug
-          answer = false
-        ensure
-          file.close unless is_io
+        rescue => e
+          warn e.message if debug
+          passed = false
         end
-        answer
+        passed
       end
     end
   end
