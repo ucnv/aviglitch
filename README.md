@@ -44,10 +44,6 @@ For more practical usages, please check <https://github.com/ucnv/aviglitch-utils
   gem install aviglitch
 ```
 
-## Known issues
-
-- This library doesn't support AVI2 format spec. This means that it will not work as expected for files larger than 1GB.
-
 ## License
 
 This library is distributed under the terms and conditions of the [MIT license](LICENSE).

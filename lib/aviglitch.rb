@@ -1,10 +1,8 @@
 require 'tempfile'
-require 'fileutils'
-require 'readline'
 require 'pathname'
 require 'stringio'
-require 'aviglitch/base'
 require 'aviglitch/avi'
+require 'aviglitch/base'
 require 'aviglitch/frame'
 require 'aviglitch/frames'
 
@@ -32,7 +30,7 @@ require 'aviglitch/frames'
 #
 module AviGlitch
 
-  VERSION = '0.1.6'
+  VERSION = '0.2.0'
 
   BUFFER_SIZE = 2 ** 24
 

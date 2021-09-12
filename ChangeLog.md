@@ -1,3 +1,11 @@
+### 0.2.0 / 2021-09-13
+
+* Support for AVI2.0 formatted files. Now this library can handle files larger than 1GB.
+* Added methods to Frames, including #index, #rindex, #first_of, and #last_of
+* Removed warnings for the file size getting large.
+* Added the class AviGlitch::Avi which manages binary RIFF-AVI data.
+* A lot of internal changes.
+
 ### 0.1.6 / 2021-08-21
 
 * Removed obsolete dependencies.
