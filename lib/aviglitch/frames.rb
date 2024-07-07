@@ -22,6 +22,7 @@ module AviGlitch
 
     ##
     # Creates a new AviGlitch::Frames object.
+    # It takes AviGlitch::Avi as an argument.
     def initialize avi
       @avi = avi
     end
@@ -31,7 +32,7 @@ module AviGlitch
     # It returns Enumerator if a block is not given.
     def each &block
       if block_given?
-        Tempfile.open('temp', binmode: true) do |newmovi|
+        Tempfile.open('temp', @avi.tmpdir, binmode: true) do |newmovi|
           @avi.process_movi do |indices, movi|
             newindices = indices.select do |m|
               movi.pos = m[:offset] + 8    # 8 for id and size

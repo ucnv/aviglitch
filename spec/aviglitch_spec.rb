@@ -92,7 +92,7 @@ describe AviGlitch do
     }.should raise_error(IOError)
   end
 
-  it 'can explicit close file' do
+  it 'can close the file explicitly' do
     avi = AviGlitch.open @in
     avi.close
     lambda {
@@ -160,7 +160,7 @@ describe AviGlitch do
     end
   end
 
-  it 'should check if keyframes exist.' do
+  it 'should check if keyframes exist' do
     a = AviGlitch.open @in
     a.has_keyframe?.should be true
     a.glitch :keyframe do |f|
@@ -189,6 +189,25 @@ describe AviGlitch do
     end
 
     expect(dc1).to eq(dc2)
+  end
+
+  it 'can be set custom temp dir' do
+    custom_tmpdir = Pathname.new(OUTPUT_DIR) + 'custom_tmpdir'
+    Dir.mkdir custom_tmpdir unless File.exist? custom_tmpdir
+
+    c = Dir.glob((custom_tmpdir + '*').to_s).size
+    b = AviGlitch.open @in, tmpdir: custom_tmpdir
+    b2 = b.frames[0, 100].to_avi
+    b2.frames.each do |f|
+      Dir.glob((custom_tmpdir + '*').to_s).size.should >= c
+    end
+  end
+
+  it 'shoud raise an error when specified temp dir is not writable' do
+    custom_tmpdir = Pathname.new(OUTPUT_DIR) + 'not_dir'
+    lambda {
+      AviGlitch.open @in, tmpdir: custom_tmpdir
+    }.should raise_error(SystemCallError)
   end
   
 end

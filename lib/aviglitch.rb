@@ -38,11 +38,12 @@ module AviGlitch
     ##
     # Returns AviGlitch::Base instance.
     # It requires +path_or_frames+ as String or Pathname, or Frames instance.
-    def open path_or_frames
+    # Additionally, it allows +tmpdir:+ as the internal temporary directory.
+    def open path_or_frames, tmpdir: nil
       if path_or_frames.kind_of?(Frames)
         path_or_frames.to_avi
       else
-        AviGlitch::Base.new(Pathname(path_or_frames))
+        AviGlitch::Base.new(Pathname(path_or_frames), tmpdir: tmpdir)
       end
     end
   end

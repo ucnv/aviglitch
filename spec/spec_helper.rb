@@ -50,6 +50,6 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    FileUtils.rm Dir.glob((OUTPUT_DIR + '*').to_s)
+    FileUtils.rm_r Dir.glob((OUTPUT_DIR + '*').to_s)
   end
 end

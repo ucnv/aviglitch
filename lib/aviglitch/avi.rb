@@ -79,16 +79,21 @@ module AviGlitch
     # Object which represents RIFF structure.
     attr_accessor :riff
 
-    attr_accessor :path, :movi #:nodoc:
+    attr_accessor :path, :movi, :tmpdir #:nodoc:
     protected :path, :path=, :movi, :movi=
 
     ##
-    # Generates an instance with the necessary structure from the +path+.
+    # Generates an instanc.
     def initialize path = nil
-      return if path.nil?
+      self.path = path unless path.nil?
+    end
+
+    ##
+    # Set +path+ of the source file.
+    def path= path #:nodoc:
       @path = path
       File.open(path, 'rb') do |io|
-        @movi = Tempfile.new 'aviglitch', binmode: true
+        @movi = Tempfile.new 'aviglitch', @tmpdir, binmode: true
         @riff = []
         @indices = []
         @superidx = []
@@ -395,7 +400,7 @@ module AviGlitch
       avi.indices = Marshal.load md
       md = Marshal.dump @riff
       avi.riff = Marshal.load md
-      newmovi = Tempfile.new 'aviglitch', binmode: true
+      newmovi = Tempfile.new 'aviglitch', @tmpdir, binmode: true
       movipos = @movi.pos
       @movi.rewind
       newmovi.print @movi.read

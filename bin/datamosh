@@ -8,6 +8,7 @@ require 'aviglitch'
 output = './out.avi'
 all = false
 fake = false
+tmpdir = nil
 
 opts = OptionParser.new do |opts|
   opts.banner = "datamosh - AviGlitch's datamoshing video generator."
@@ -27,6 +28,9 @@ opts = OptionParser.new do |opts|
       warn "The --fake option cannot use with -a/--all option.\n"
       exit
     end
+  end
+  opts.on("--tmpdir [DIR]", "Specify the temporary directory") do |dir| 
+    tmpdir = dir
   end
   opts.on_tail("-h", "--help", "Show this message") do
     puts opts
@@ -48,7 +52,7 @@ else
   end
 end
 
-a = AviGlitch.open input.shift
+a = AviGlitch.open input.shift, tmpdir: tmpdir
 unless fake
   a.glitch_with_index :keyframe do |frame, i|
     (!all && i == 0) ? frame : "" # keep the first frame
@@ -62,7 +66,7 @@ else
 end
 
 input.each do |file|
-  b = AviGlitch.open file
+  b = AviGlitch.open file, tmpdir: tmpdir
   unless fake
     b.glitch :keyframe do |frame|
       ""

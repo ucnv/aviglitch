@@ -14,14 +14,16 @@ module AviGlitch
     # Creates a new instance of AviGlitch::Base, open the file and 
     # make it ready to manipulate.
     # It requires +path+ as Pathname or an instance of AviGlirtch::Avi.
-    def initialize path_or_object
+    def initialize path_or_object, tmpdir: nil
       if path_or_object.kind_of?(Avi)
         @avi = path_or_object
       else
         unless AviGlitch::Base.surely_formatted? path_or_object
           raise 'Unsupported file passed.'
         end
-        @avi = Avi.new path_or_object
+        @avi = Avi.new 
+        @avi.tmpdir = tmpdir
+        @avi.path = path_or_object
       end
       @frames = Frames.new @avi
     end
