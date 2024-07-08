@@ -400,7 +400,7 @@ module AviGlitch
       avi.indices = Marshal.load md
       md = Marshal.dump @riff
       avi.riff = Marshal.load md
-      newmovi = Tempfile.new 'aviglitch', @tmpdir, binmode: true
+      newmovi = Tempfile.new 'aviglitch-clone', @tmpdir, binmode: true
       movipos = @movi.pos
       @movi.rewind
       newmovi.print @movi.read

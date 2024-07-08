@@ -50,6 +50,10 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    FileUtils.rm_r Dir.glob((OUTPUT_DIR + '*').to_s)
+    begin
+      FileUtils.rm_r Dir.glob((OUTPUT_DIR + '*').to_s)
+    rescue => e
+      # Sometimes windows can't remove files.
+    end
   end
 end

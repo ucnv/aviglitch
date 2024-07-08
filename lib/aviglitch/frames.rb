@@ -32,7 +32,7 @@ module AviGlitch
     # It returns Enumerator if a block is not given.
     def each &block
       if block_given?
-        Tempfile.open('temp', @avi.tmpdir, binmode: true) do |newmovi|
+        Tempfile.open('aviglitch-temp', @avi.tmpdir, binmode: true) do |newmovi|
           @avi.process_movi do |indices, movi|
             newindices = indices.select do |m|
               movi.pos = m[:offset] + 8    # 8 for id and size
