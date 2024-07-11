@@ -137,6 +137,7 @@ module AviGlitch
       times.times do
         result.concat frames
       end
+      frames.terminate
       result
     end
 
@@ -177,6 +178,8 @@ module AviGlitch
       tail = self.slice((b + l)..-1)
       self.clear
       self.concat head + tail
+      head.terminate
+      tail.terminate
       sliced
     end
 
@@ -200,6 +203,7 @@ module AviGlitch
 
       self.clear
       self.concat new_frames
+      new_frames.terminate
     end
 
     ##
@@ -343,6 +347,7 @@ module AviGlitch
 
       self.clear
       self.concat new_frames
+      new_frames.terminate
       self
     end
 
@@ -368,6 +373,13 @@ module AviGlitch
     # Returns true if +other+'s frames are same as self's frames.
     def == other
       @avi == other.avi
+    end
+
+    ##
+    # Closes the internal temp file explicitly. This instance becomes unusable.
+    def terminate
+      @avi.close
+      @avi = nil
     end
 
     ##
