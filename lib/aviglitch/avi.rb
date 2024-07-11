@@ -83,8 +83,9 @@ module AviGlitch
     protected :path, :path=, :movi, :movi=
 
     ##
-    # Generates an instanc.
+    # Generates an instance.
     def initialize path = nil
+      return unless @movi.nil? # don't reconfigure the path when cloning
       self.path = path unless path.nil?
     end
 
@@ -395,18 +396,19 @@ module AviGlitch
     end
 
     def initialize_copy avi #:nodoc:
-      avi.path = @path.dup
-      md = Marshal.dump @indices
-      avi.indices = Marshal.load md
-      md = Marshal.dump @riff
-      avi.riff = Marshal.load md
+      md = Marshal.dump avi.indices
+      @indices = Marshal.load md
+      md = Marshal.dump avi.riff
+      @riff = Marshal.load md
       newmovi = Tempfile.new 'aviglitch-clone', @tmpdir, binmode: true
-      movipos = @movi.pos
-      @movi.rewind
-      newmovi.print @movi.read
-      @movi.pos = movipos
+      movipos = avi.movi.pos
+      avi.movi.rewind
+      while d = avi.movi.read(BUFFER_SIZE) do
+        newmovi.print d
+      end
+      avi.movi.pos = movipos
       newmovi.rewind
-      avi.movi = newmovi
+      @movi = newmovi
     end
 
     def print_chunk io, chunk  #:nodoc:
