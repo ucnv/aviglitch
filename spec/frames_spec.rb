@@ -1,6 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe AviGlitch::Frames do
+# Since Ruby 3.3.x, Windows frequently fails to close the Tempfile automatically. 
+# Now this spec is skipped in Windows because it could generate a lot of warnings.
+# Although not a fatal error, it should be better to remove them manually in such cases.
+describe AviGlitch::Frames, :skip => Gem.win_platform? do
 
   before :all do
     AviGlitch::Frames.class_eval do
@@ -479,8 +482,7 @@ describe AviGlitch::Frames do
     expect(File.size(@out)).to be < File.size(@in)
   end
 
-  it 'should use Enumerator as an external iterator',
-     :skip => Gem::Version.new(RUBY_VERSION.dup) < Gem::Version.new('1.9.0') || RUBY_PLATFORM == 'java' do
+  it 'should use Enumerator as an external iterator' do
     a = AviGlitch.open @in
     e = a.frames.each
     expect {

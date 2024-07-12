@@ -177,9 +177,12 @@ module AviGlitch
       l = 1 if l.nil?
       tail = self.slice((b + l)..-1)
       self.clear
-      self.concat head + tail
+      temp = head + tail
+      self.concat temp
+      temp.terminate
       head.terminate
       tail.terminate
+      
       sliced
     end
 
@@ -203,7 +206,10 @@ module AviGlitch
 
       self.clear
       self.concat new_frames
+      
       new_frames.terminate
+      head.terminate
+      rest.terminate
     end
 
     ##

@@ -31,6 +31,7 @@ describe AviGlitch, 'AVI2.0' do
     n.times do
       fx = f[0..-1]
       f.concat fx
+      fx.terminate
     end
     f.to_avi.output @out
     b = AviGlitch.open @out
