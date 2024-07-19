@@ -1,3 +1,9 @@
+### 0.2.2 / 2024-07-20
+
+* Added option to set a custom directory for temporary files that internally duplicate input files.
+* Also added an option for the custom temp directory in the datamosh cli.
+* Some improvements regarding internal temporary files.
+
 ### 0.2.0 / 2021-09-13
 
 * Support for AVI2.0 formatted files. Now this library can handle files larger than 1GB.

@@ -28,9 +28,16 @@ require 'aviglitch/frames'
 #   end
 #   avi.output '/path/to/broken.avi'
 #
+# Since v0.2.2, it allows to specify the temporary directory. This library
+# duplicates and processes a input file in the temporary directory, which
+# by default is +Dir.tmpdir+. To specify the custom temporary directory, use 
+# +tmpdir:+ option, like:
+#
+#   avi = AviGlitch.open '/path/to/your.avi', tmpdir: '/path/to/tmpdir'
+#
 module AviGlitch
 
-  VERSION = '0.2.0'
+  VERSION = '0.2.2'
 
   BUFFER_SIZE = 2 ** 24
 

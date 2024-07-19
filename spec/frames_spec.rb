@@ -1,8 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-# Since Ruby 3.3.x, Windows frequently fails to close the Tempfile automatically. 
-# Now this spec is skipped in Windows because it could generate a lot of warnings.
+# Since Ruby 3.3.x, Windows frequently fails to close the Tempfile on GC.
 # Although not a fatal error, it should be better to remove them manually in such cases.
+# Now this spec is skipped in Windows because it could generate a lot of warning messages and undeleted temp files.
 describe AviGlitch::Frames, :skip => Gem.win_platform? do
 
   before :all do
